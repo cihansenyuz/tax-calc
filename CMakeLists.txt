@@ -12,6 +12,10 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         src/main.cpp
+
+        gui/mainwindow.ui
+        gui/mainwindow.cpp
+        gui/mainwindow.hpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

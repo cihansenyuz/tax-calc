@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 
+#include "../inc/asset_manager.hpp"
+#include "../inc/network/evdsfetcher.h"
+#include "../inc/network/httpmanager.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -15,6 +19,11 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    AssetManager m_asset_manager;
+    EvdsFetcher *m_evds_fetcher;
+    static constexpr const char* API_KEY = "HSzat3MFdF";
+    HttpManager *m_http_manager;
 };
 
 #endif // MAINWINDOW_HPP

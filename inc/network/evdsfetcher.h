@@ -13,7 +13,7 @@ public:
     explicit EvdsFetcher(HttpManager *manager, QObject *parent = nullptr);
     void fetch(const QString &series, const QString &startDate, const QString &endDate);
 
-    static constexpr const char* USD = "TP.DK.USD.A";
+    static constexpr const char* SERIES = "TP.DK.USD.A-TP.TUFE1YI.T1";
 
 signals:
     void evdsDataFetched(const std::shared_ptr<QJsonObject> &data);

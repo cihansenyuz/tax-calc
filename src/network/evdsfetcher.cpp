@@ -9,7 +9,7 @@ EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)
 
 void EvdsFetcher::fetch(const QString &series, const QString &startDate, const QString &endDate)
 {
-    QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
+    QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last-last")
                         .arg(series, startDate, endDate);
     http_manager_->FetchJsonData(query);
 }

@@ -22,10 +22,28 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    m_evds_fetcher->fetch(EvdsFetcher::USD, "21-04-2024", "23-04-2024");
+    connect(ui->createButton, &QPushButton::clicked, this, &MainWindow::onCreateButtonClicked);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onCreateButtonClicked()
+{
+    if (!m_create_dialog) {
+        m_create_dialog = std::make_unique<CreateDialog>(this);
+        connect(m_create_dialog.get(), &CreateDialog::assetCreated, this,
+                [this](const Asset &new_asset) {
+            m_asset_manager.addAsset(new_asset);
+            qDebug() << "Asset created:" << new_asset.getSymbol()
+                     << new_asset.getSymbolName() << new_asset.getBuyPrice();
+
+            qDebug() << "Total assets managed:" << m_asset_manager.size();
+        });
+
+        m_create_dialog->exec();
+        m_create_dialog.reset();
+    }
 }

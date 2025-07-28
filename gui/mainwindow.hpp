@@ -6,6 +6,7 @@
 #include "../inc/asset_manager.hpp"
 #include "../inc/network/evdsfetcher.h"
 #include "../inc/network/httpmanager.h"
+#include "createdialog.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,8 +18,13 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onCreateButtonClicked();
+
 private:
     Ui::MainWindow *ui;
+
+    std::unique_ptr<CreateDialog> m_create_dialog;
 
     AssetManager m_asset_manager;
     EvdsFetcher *m_evds_fetcher;

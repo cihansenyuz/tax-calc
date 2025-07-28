@@ -15,10 +15,12 @@ set(PROJECT_SOURCES
 
         src/network/networkcore.cpp
         src/network/getrequest.cpp
+        src/network/evdsfetcher.cpp
 
         inc/network/networkcore.h
         inc/network/getrequest.h
         inc/network/httpmanager.h
+        inc/network/evdsfetcher.h
 
         gui/mainwindow.ui
         gui/mainwindow.cpp

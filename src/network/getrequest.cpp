@@ -28,9 +28,8 @@ void GetRequest::OnFetchJsonDataReplyRecieved(){
     qDebug() << "#########################################\n";
 }
 
-void GetRequest::FetchJsonData(){
-    
-    SendHttpRequest("TP.DK.USD.A&startDate=01-01-2025&endDate=01-20-2025&type=json", parent_->key, this, &GetRequest::OnFetchJsonDataReplyRecieved);
+void GetRequest::FetchJsonData(const QString &api_query){
+    SendHttpRequest(api_query, parent_->key, this, &GetRequest::OnFetchJsonDataReplyRecieved);
 }
 
 QNetworkReply* GetRequest::GetHttpReply(const QNetworkRequest &request){

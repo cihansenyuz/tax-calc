@@ -8,7 +8,7 @@ class GetRequest : public NetworkCore
     Q_OBJECT
 public:
     GetRequest(HttpManager *parent = nullptr);
-    void FetchJsonData();
+    void FetchJsonData(const QString &api_query);
 
 signals:
     void JsonFetched(const std::shared_ptr<QJsonObject> &fetched_data);

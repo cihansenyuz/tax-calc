@@ -8,10 +8,17 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_PREFIX_PATH "/home/cihan/Qt/6.9.1/gcc_64/lib/cmake")
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
 
 set(PROJECT_SOURCES
         src/main.cpp
+
+        src/network/networkcore.cpp
+        src/network/getrequest.cpp
+
+        inc/network/networkcore.h
+        inc/network/getrequest.h
+        inc/network/httpmanager.h
 
         gui/mainwindow.ui
         gui/mainwindow.cpp
@@ -22,4 +29,4 @@ set(PROJECT_SOURCES
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Network)

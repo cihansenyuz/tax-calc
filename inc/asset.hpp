@@ -12,6 +12,7 @@ private:
     double m_exchangeRate;
 
 public:
+    Asset() = default;
     Asset(  const std::string& symbol,
             const std::string& symbolName,
             QDate buyDate,

@@ -11,10 +11,21 @@ public:
     ~AssetManager();
 
     void addAsset(const Asset& asset);
+    void updateAsset(Asset& asset);
     const std::vector<Asset>& getAssets() const { return m_assets; }
     void clear() { m_assets.clear(); }
     size_t size() const { return m_assets.size(); }
     bool empty() const { return m_assets.empty(); }
+    void printAssets() const {
+        for (const auto& asset : m_assets) {
+            qDebug() << "Asset Symbol:" << QString::fromStdString(asset.getSymbol())
+                     << "Name:" << QString::fromStdString(asset.getSymbolName())
+                     << "Buy Price:" << asset.getBuyPrice()
+                     << "Buy Date:" << asset.getBuyDate()
+                     << "Inflation Index:" << asset.getInflationIndex()
+                     << "Exchange Rate:" << asset.getExchangeRate();
+        }
+    }
 
 signals:
     void assetDataFetched(const std::shared_ptr<QJsonObject> &data);
@@ -24,6 +35,7 @@ private slots:
 
 private:
     std::vector<Asset> m_assets;
+    Asset m_asset_to_be_updated;
     class HttpManager *m_http_manager;
     class EvdsFetcher *m_evds_fetcher;
     static constexpr const char* API_KEY = "HSzat3MFdF";

@@ -1,29 +1,32 @@
 #pragma once
 #include <string>
+#include <QDate>
 
 class Asset {
 private:
     std::string m_symbol;
     std::string m_symbolName;
+    QDate m_buyDate;
     double m_buyPrice;
     double m_inflationIndex;
     double m_exchangeRate;
 
 public:
-    Asset() : m_buyPrice(0.0), m_inflationIndex(0.0), m_exchangeRate(0.0) {}
     Asset(  const std::string& symbol,
             const std::string& symbolName,
-            double buyPrice,
-            double inflationIndex,
-            double exchangeRate)
+            QDate buyDate,
+            double buyPrice)
         : m_symbol(symbol),
           m_symbolName(symbolName),
-          m_buyPrice(buyPrice),
-          m_inflationIndex(inflationIndex),
-          m_exchangeRate(exchangeRate) {}
+          m_buyDate(buyDate),
+          m_buyPrice(buyPrice) {
+                m_inflationIndex = 0.0;
+                m_exchangeRate = 0.0;
+          }
 
     std::string getSymbol() const { return m_symbol; }
     std::string getSymbolName() const { return m_symbolName; }
+    QString getBuyDate() const { return m_buyDate.toString("dd-MM-yyyy"); }
     double getBuyPrice() const { return m_buyPrice; }
     double getInflationIndex() const { return m_inflationIndex; }
     double getExchangeRate() const { return m_exchangeRate; }

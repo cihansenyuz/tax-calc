@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include "../inc/asset_manager.hpp"
+#include "../inc/assetmanager.hpp"
 #include "../inc/network/evdsfetcher.h"
 #include "../inc/network/httpmanager.h"
 #include "createdialog.hpp"
@@ -23,13 +23,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
     std::unique_ptr<CreateDialog> m_create_dialog;
-
-    AssetManager m_asset_manager;
-    EvdsFetcher *m_evds_fetcher;
-    static constexpr const char* API_KEY = "HSzat3MFdF";
-    HttpManager *m_http_manager;
+    AssetManager *m_asset_manager;
 };
 
 #endif // MAINWINDOW_HPP

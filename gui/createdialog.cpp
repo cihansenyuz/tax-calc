@@ -14,8 +14,12 @@ void CreateDialog::onOkClicked()
     QString symbolStr = symbol();
     QString nameStr = name();
     double price = buyPrice();
+    QDate date = buyDate();
 
-    Asset newAsset(symbolStr.toStdString(), nameStr.toStdString(), price, 0.0, 0.0);
+    Asset newAsset(symbolStr.toStdString(),
+                   nameStr.toStdString(),
+                   date,
+                   price);
     emit assetCreated(newAsset);
     accept();
 }

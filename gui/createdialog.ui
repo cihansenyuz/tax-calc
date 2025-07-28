@@ -27,16 +27,38 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="symbolLineEdit"/>
+      <widget class="QLineEdit" name="symbolLineEdit">
+       <property name="text">
+        <string>Enter symbol</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="nameLineEdit"/>
+      <widget class="QLineEdit" name="nameLineEdit">
+       <property name="text">
+        <string>Enter name</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="buyPriceSpinBox"/>
+      <widget class="QDoubleSpinBox" name="buyPriceSpinBox">
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::ButtonSymbols::UpDownArrows</enum>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="maximum">
+        <double>9999.989999999999782</double>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QDateEdit" name="buyDateEdit"/>
+      <widget class="QDateEdit" name="buyDateEdit">
+       <property name="displayFormat">
+        <string>dd/MM/yyyy</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

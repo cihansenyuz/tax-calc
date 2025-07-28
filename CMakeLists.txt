@@ -1,15 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(desktop_application VERSION 0.1 LANGUAGES CXX)
+project(tax_calc)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 COMPONENTS Widgets REQUIRED)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_PREFIX_PATH "/home/cihan/Qt/6.9.1/gcc_64/lib/cmake")
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-add_executable(${PROJECT_NAME}
-    main.cpp
+set(PROJECT_SOURCES
+        src/main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)

@@ -20,6 +20,7 @@ public:
 
 private slots:
     void onCreateButtonClicked();
+    void onPrintButtonClicked();
 
 private:
     Ui::MainWindow *ui;

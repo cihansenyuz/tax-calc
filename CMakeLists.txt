@@ -27,6 +27,8 @@ set(PROJECT_SOURCES
         gui/mainwindow.hpp
 
         gui/createdialog.ui
+        gui/createdialog.cpp
+        gui/createdialog.hpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

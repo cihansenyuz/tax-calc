@@ -1,27 +1,34 @@
 #include "createdialog.hpp"
 #include "ui_createdialog.h"
+#include <QMessageBox>
 
 CreateDialog::CreateDialog(QWidget *parent)
     : QDialog(parent),
       ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &CreateDialog::onOkClicked);
+    connect(ui->buttonBox, &QDialogButtonBox::accepted,
+            this, &CreateDialog::onOkClicked);
 }
 void CreateDialog::onOkClicked()
 {
-    // Gather user input
     QString symbolStr = symbol();
     QString nameStr = name();
     double price = buyPrice();
     QDate date = buyDate();
     int quantity = ui->quantitySpinBox->value();
 
-    Asset newAsset(symbolStr.toStdString(),
-                   nameStr.toStdString(),
-                   date,
-                   price,
-                   quantity);
+    if (symbolStr.isEmpty() || nameStr.isEmpty() || price <= 0 || quantity <= 0) {
+        QMessageBox::warning(this, "Input Error", "Please fill in all fields correctly.");
+        return;
+    }
+
+    Asset newAsset = Asset::createWithUniqueId(symbolStr.toStdString(),
+                                            nameStr.toStdString(),
+                                            date,
+                                            price,
+                                            quantity
+                                        );
     emit assetCreated(newAsset);
     accept();
 }

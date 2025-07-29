@@ -1,8 +1,16 @@
 #include "../../inc/database/assetdatabase.hpp"
+#include "../../inc/asset.hpp"
+
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <QString>
+
+
+AssetDatabase& AssetDatabase::getInstance(const QString& dbPath) {
+    static AssetDatabase instance(dbPath);
+    return instance;
+}
 
 AssetDatabase::AssetDatabase(const QString& dbPath) {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -48,10 +56,11 @@ bool AssetDatabase::initAssetTable() {
 bool AssetDatabase::saveAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "INSERT INTO assets (symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndex, exchangeRate) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndex, exchangeRate) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
+    query.addBindValue(asset.getId());
     query.addBindValue(QString::fromStdString(asset.getSymbol()));
     query.addBindValue(QString::fromStdString(asset.getSymbolName()));
     query.addBindValue(asset.getBuyDate());
@@ -71,10 +80,10 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
 
 bool AssetDatabase::updateAsset(const Asset& asset) {
     QSqlQuery query(m_db);
-    // Assuming symbol is unique for update
     query.prepare(
-        "UPDATE assets SET symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndex=?, exchangeRate=? WHERE symbol=?"
+        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndex=?, exchangeRate=? WHERE id=?"
     );
+    query.addBindValue(QString::fromStdString(asset.getSymbol()));
     query.addBindValue(QString::fromStdString(asset.getSymbolName()));
     query.addBindValue(asset.getBuyDate());
     query.addBindValue(asset.getBuyPrice());
@@ -84,7 +93,7 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
     query.addBindValue(asset.getStatus());
     query.addBindValue(asset.getInflationIndex());
     query.addBindValue(asset.getExchangeRate());
-    query.addBindValue(QString::fromStdString(asset.getSymbol()));
+    query.addBindValue(asset.getId());
     if (!query.exec()) {
         qWarning() << "Failed to update asset:" << query.lastError().text();
         return false;
@@ -96,24 +105,35 @@ std::vector<Asset> AssetDatabase::loadAssets() {
     std::vector<Asset> assets;
     QSqlQuery query(m_db);
 
-    if (!query.exec("SELECT symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndex, exchangeRate FROM assets")) {
+    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndex, exchangeRate FROM assets")) {
         qWarning() << "Failed to load assets:" << query.lastError().text();
         return assets;
     }
     while (query.next()) {
         Asset asset(
-            query.value(0).toString().toStdString(),
-            query.value(1).toString().toStdString(),
-            QDate::fromString(query.value(2).toString(), Qt::ISODate),
-            query.value(3).toDouble(),
-            query.value(4).toInt(),
-            QDate::fromString(query.value(5).toString(), Qt::ISODate),
-            query.value(6).toDouble(),
-            query.value(7).toString()
+            query.value(0).toInt(), // id
+            query.value(1).toString().toStdString(), // symbol
+            query.value(2).toString().toStdString(), // symbolName
+            QDate::fromString(query.value(3).toString(), Qt::ISODate), // buyDate
+            query.value(4).toDouble(), // buyPrice
+            query.value(5).toInt(), // quantity
+            QDate::fromString(query.value(6).toString(), Qt::ISODate), // sellDate
+            query.value(7).toDouble(), // sellPrice
+            query.value(8).toString() // status
         );
-        asset.setInflationIndex(query.value(8).toDouble());
-        asset.setExchangeRate(query.value(9).toDouble());
+        asset.setInflationIndex(query.value(9).toDouble());
+        asset.setExchangeRate(query.value(10).toDouble());
         assets.push_back(asset);
     }
     return assets;
+}
+
+bool AssetDatabase::idExists(int id) {
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) FROM assets WHERE id=?");
+    query.addBindValue(id);
+    if (!query.exec() || !query.next()) {
+        return false;
+    }
+    return query.value(0).toInt() > 0;
 }

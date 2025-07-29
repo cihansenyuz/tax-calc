@@ -2,8 +2,11 @@
 #include <string>
 #include <QDate>
 
+#include "../inc/database/assetdatabase.hpp"
+
 class Asset {
 private:
+    int m_id = -1;
     std::string m_symbol;
     std::string m_symbolName;
     QDate m_buyDate;
@@ -17,7 +20,8 @@ private:
 
 public:
     Asset() = default;
-    Asset(const std::string& symbol,
+    Asset(int id,
+          const std::string& symbol,
           const std::string& symbolName,
           QDate buyDate,
           double buyPrice,
@@ -25,7 +29,8 @@ public:
           QDate sellDate = QDate(),
           double sellPrice = 0.0,
           const QString& status = "Açık")
-        : m_symbol(symbol),
+        : m_id(id),
+          m_symbol(symbol),
           m_symbolName(symbolName),
           m_buyDate(buyDate),
           m_buyPrice(buyPrice),
@@ -37,6 +42,24 @@ public:
         m_exchangeRate = 0.0;
     }
 
+    static Asset createWithUniqueId(
+           const std::string& symbol,
+           const std::string& symbolName,
+           QDate buyDate,
+           double buyPrice,
+           int quantity,
+           QDate sellDate = QDate(),
+           double sellPrice = 0.0,
+           const QString& status = "Açık") {
+        int id;
+        do {
+            id = rand();
+        } while (AssetDatabase::getInstance().idExists(id));
+        return Asset(id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status);
+    }
+
+    int getId() const { return m_id; }
+    void setId(int id) { m_id = id; }
     std::string getSymbol() const { return m_symbol; }
     std::string getSymbolName() const { return m_symbolName; }
     QString getBuyDate() const { return m_buyDate.toString("dd-MM-yyyy"); }

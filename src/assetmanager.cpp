@@ -11,14 +11,14 @@ AssetManager::AssetManager(QObject *parent)
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
     
-    m_asset_db = new AssetDatabase("assets.db");
+    m_asset_db = & AssetDatabase::getInstance("assets.db");
     m_asset_db->initAssetTable();
+    m_assets = m_asset_db->loadAssets();
 }
 
 AssetManager::~AssetManager() {
     delete m_evds_fetcher;
     delete m_http_manager;
-    delete m_asset_db;
 }
 
 bool AssetManager::updateAssetInDb(const Asset& asset){
@@ -72,6 +72,7 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
     m_asset_to_be_updated.setInflationIndex(tufeValue);
 
     m_assets.push_back(m_asset_to_be_updated);
+    m_asset_db->saveAsset(m_asset_to_be_updated);
     emit assetUpdated();
 
     QFile file("fetched_data.json");

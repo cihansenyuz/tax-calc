@@ -14,6 +14,7 @@ public:
     ~AssetManager();
 
     void openTransaction(const Asset& asset);
+    void closeTransaction(const Asset& asset);
     void updateAsset(Asset& asset);
     const std::vector<Asset>& getAssets() const { return m_assets; }
     void clear() { m_assets.clear(); }

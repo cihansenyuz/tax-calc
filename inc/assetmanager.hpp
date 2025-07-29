@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <QObject>
+#include <mutex>
+#include <condition_variable>
 #include "asset.hpp"
 #include "database/assetdatabase.hpp"
 
@@ -11,7 +13,7 @@ public:
     explicit AssetManager(QObject *parent = nullptr);
     ~AssetManager();
 
-    void addAsset(const Asset& asset);
+    void openTransaction(const Asset& asset);
     void updateAsset(Asset& asset);
     const std::vector<Asset>& getAssets() const { return m_assets; }
     void clear() { m_assets.clear(); }
@@ -23,7 +25,6 @@ public:
     bool loadAssetsFromDb();
 
 signals:
-    void assetDataFetched(const std::shared_ptr<QJsonObject> &data);
     void databaseReady();
 
 private slots:
@@ -32,6 +33,9 @@ private slots:
 private:
     std::vector<Asset> m_assets;
     Asset m_asset_to_be_updated;
+    std::pair<double, double> m_data_to_be_updated; // (USD, TUFE)
+    std::mutex m_mutex;
+    std::condition_variable m_condition;
     class HttpManager *m_http_manager;
     class EvdsFetcher *m_evds_fetcher;
     class AssetDatabase *m_asset_db;

@@ -34,13 +34,12 @@ void MainWindow::onCreateButtonClicked()
     if (!m_create_dialog) {
         m_create_dialog = std::make_unique<CreateDialog>(this);
         connect(m_create_dialog.get(), &CreateDialog::assetCreated,
-                m_asset_manager, &AssetManager::addAsset, Qt::SingleShotConnection);
+                m_asset_manager, &AssetManager::openTransaction, Qt::SingleShotConnection);
+        connect(m_asset_manager, &AssetManager::databaseReady,
+                this, &MainWindow::updateTable, Qt::SingleShotConnection);
 
         m_create_dialog->exec();
         m_create_dialog.reset();
-
-        connect(m_asset_manager, &AssetManager::databaseReady,
-                this, &MainWindow::updateTable, Qt::SingleShotConnection);
     }
 }
 

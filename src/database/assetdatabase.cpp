@@ -43,8 +43,10 @@ bool AssetDatabase::initAssetTable() {
         "sellDate TEXT,"
         "sellPrice REAL,"
         "status TEXT,"
-        "inflationIndex REAL,"
-        "exchangeRate REAL"
+        "inflationIndexAtBuy REAL,"
+        "exchangeRateAtBuy REAL,"
+        "inflationIndexAtSell REAL,"
+        "exchangeRateAtSell REAL"
         ");";
     if (!query.exec(createTable)) {
         qWarning() << "Failed to create assets table:" << query.lastError().text();
@@ -56,8 +58,8 @@ bool AssetDatabase::initAssetTable() {
 bool AssetDatabase::saveAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndex, exchangeRate) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
     query.addBindValue(asset.getId());
@@ -69,8 +71,10 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
     query.addBindValue(asset.getSellDate());
     query.addBindValue(asset.getSellPrice());
     query.addBindValue(asset.getStatus());
-    query.addBindValue(asset.getInflationIndex());
-    query.addBindValue(asset.getExchangeRate());
+    query.addBindValue(asset.getInflationIndexAtBuy());
+    query.addBindValue(asset.getExchangeRateAtBuy());
+    query.addBindValue(asset.getInflationIndexAtSell());
+    query.addBindValue(asset.getExchangeRateAtSell());
     if (!query.exec()) {
         qWarning() << "Failed to insert asset:" << query.lastError().text();
         return false;
@@ -81,7 +85,7 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
 bool AssetDatabase::updateAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndex=?, exchangeRate=? WHERE id=?"
+        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndexAtBuy=?, exchangeRateAtBuy=?, inflationIndexAtSell=?, exchangeRateAtSell=? WHERE id=?"
     );
     query.addBindValue(QString::fromStdString(asset.getSymbol()));
     query.addBindValue(QString::fromStdString(asset.getSymbolName()));
@@ -91,8 +95,10 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
     query.addBindValue(asset.getSellDate());
     query.addBindValue(asset.getSellPrice());
     query.addBindValue(asset.getStatus());
-    query.addBindValue(asset.getInflationIndex());
-    query.addBindValue(asset.getExchangeRate());
+    query.addBindValue(asset.getInflationIndexAtBuy());
+    query.addBindValue(asset.getExchangeRateAtBuy());
+    query.addBindValue(asset.getInflationIndexAtSell());
+    query.addBindValue(asset.getExchangeRateAtSell());
     query.addBindValue(asset.getId());
     if (!query.exec()) {
         qWarning() << "Failed to update asset:" << query.lastError().text();
@@ -105,7 +111,7 @@ std::vector<Asset> AssetDatabase::loadAssets() {
     std::vector<Asset> assets;
     QSqlQuery query(m_db);
 
-    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndex, exchangeRate FROM assets")) {
+    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell FROM assets")) {
         qWarning() << "Failed to load assets:" << query.lastError().text();
         return assets;
     }
@@ -119,10 +125,12 @@ std::vector<Asset> AssetDatabase::loadAssets() {
             query.value(5).toInt(), // quantity
             QDate::fromString(query.value(6).toString(), "dd-MM-yyyy"), // sellDate
             query.value(7).toDouble(), // sellPrice
-            query.value(8).toString() // status
+            query.value(8).toString(), // status
+            query.value(9).toDouble(), // inflationIndexAtBuy
+            query.value(10).toDouble(), // exchangeRateAtBuy
+            query.value(11).toDouble(), // inflationIndexAtSell
+            query.value(12).toDouble() // exchangeRateAtSell
         );
-        asset.setInflationIndex(query.value(9).toDouble());
-        asset.setExchangeRate(query.value(10).toDouble());
         assets.push_back(asset);
     }
     return assets;

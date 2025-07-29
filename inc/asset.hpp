@@ -15,8 +15,10 @@ private:
     QDate m_sellDate;
     double m_sellPrice;
     QString m_status;
-    double m_inflationIndex;
-    double m_exchangeRate;
+    double m_inflationIndexAtBuy;
+    double m_exchangeRateAtBuy;
+    double m_inflationIndexAtSell;
+    double m_exchangeRateAtSell;
 
 public:
     Asset() = default;
@@ -28,7 +30,11 @@ public:
           int quantity,
           QDate sellDate = QDate(),
           double sellPrice = 0.0,
-          const QString& status = "Açık")
+          const QString& status = "Açık",
+          double inflationIndexAtBuy = 0.0,
+          double exchangeRateAtBuy = 0.0,
+          double inflationIndexAtSell = 0.0,
+          double exchangeRateAtSell = 0.0)
         : m_id(id),
           m_symbol(symbol),
           m_symbolName(symbolName),
@@ -37,25 +43,23 @@ public:
           m_quantity(quantity),
           m_sellDate(sellDate),
           m_sellPrice(sellPrice),
-          m_status(status) {
-        m_inflationIndex = 0.0;
-        m_exchangeRate = 0.0;
-    }
+          m_status(status),
+          m_inflationIndexAtBuy(inflationIndexAtBuy),
+          m_exchangeRateAtBuy(exchangeRateAtBuy),
+          m_inflationIndexAtSell(inflationIndexAtSell),
+          m_exchangeRateAtSell(exchangeRateAtSell) {}
 
     static Asset createWithUniqueId(
            const std::string& symbol,
            const std::string& symbolName,
            QDate buyDate,
            double buyPrice,
-           int quantity,
-           QDate sellDate = QDate(),
-           double sellPrice = 0.0,
-           const QString& status = "Açık") {
+           int quantity) {
         int id;
         do {
             id = rand();
         } while (AssetDatabase::getInstance().idExists(id));
-        return Asset(id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status);
+        return Asset(id, symbol, symbolName, buyDate, buyPrice, quantity);
     }
 
     int getId() const { return m_id; }
@@ -68,8 +72,10 @@ public:
     QString getSellDate() const { return m_sellDate.isValid() ? m_sellDate.toString("dd-MM-yyyy") : ""; }
     double getSellPrice() const { return m_sellPrice; }
     QString getStatus() const { return m_status; }
-    double getInflationIndex() const { return m_inflationIndex; }
-    double getExchangeRate() const { return m_exchangeRate; }
+    double getInflationIndexAtBuy() const { return m_inflationIndexAtBuy; }
+    double getExchangeRateAtBuy() const { return m_exchangeRateAtBuy; }
+    double getInflationIndexAtSell() const { return m_inflationIndexAtSell; }
+    double getExchangeRateAtSell() const { return m_exchangeRateAtSell; }
 
     void setSymbol(const std::string& s) { m_symbol = s; }
     void setSymbolName(const std::string& n) { m_symbolName = n; }
@@ -78,6 +84,8 @@ public:
     void setSellDate(const QDate& d) { m_sellDate = d; }
     void setSellPrice(double p) { m_sellPrice = p; }
     void setStatus(const QString& s) { m_status = s; }
-    void setInflationIndex(double i) { m_inflationIndex = i; }
-    void setExchangeRate(double r) { m_exchangeRate = r; }
+    void setInflationIndexAtBuy(double i) { m_inflationIndexAtBuy = i; }
+    void setExchangeRateAtBuy(double r) { m_exchangeRateAtBuy = r; }
+    void setInflationIndexAtSell(double i) { m_inflationIndexAtSell = i; }
+    void setExchangeRateAtSell(double r) { m_exchangeRateAtSell = r; }
 };

@@ -68,8 +68,8 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
         }
     }
 
-    m_asset_to_be_updated.setExchangeRate(usdValue);
-    m_asset_to_be_updated.setInflationIndex(tufeValue);
+    m_asset_to_be_updated.setExchangeRateAtBuy(usdValue);
+    m_asset_to_be_updated.setInflationIndexAtBuy(tufeValue);
 
     m_assets.push_back(m_asset_to_be_updated);
     m_asset_db->saveAsset(m_asset_to_be_updated);

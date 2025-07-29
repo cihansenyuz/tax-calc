@@ -7,7 +7,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     m_asset_manager = new AssetManager(this);
     connect(ui->createButton, &QPushButton::clicked, this, &MainWindow::onCreateButtonClicked);
-    connect(ui->printButton, &QPushButton::clicked, this, &MainWindow::onPrintButtonClicked);
 
     ui->tableWidget->setColumnCount(8);
     QStringList labels;
@@ -20,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
         << "Satış Fiyatı"
         << "Durum";
     ui->tableWidget->setHorizontalHeaderLabels(labels);
+    ui->tableWidget->resizeColumnsToContents();
 }
 
 MainWindow::~MainWindow()
@@ -38,10 +38,13 @@ void MainWindow::onCreateButtonClicked()
         });
         m_create_dialog->exec();
         m_create_dialog.reset();
+
+        connect(m_asset_manager, &AssetManager::assetUpdated,
+                this, &MainWindow::updateTable, Qt::SingleShotConnection);
     }
 }
 
-void MainWindow::onPrintButtonClicked()
+void MainWindow::updateTable()
 {
     ui->tableWidget->clearContents();
 

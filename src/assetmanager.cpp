@@ -54,6 +54,7 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
     m_asset_to_be_updated.setInflationIndex(tufeValue);
 
     m_assets.push_back(m_asset_to_be_updated);
+    emit assetUpdated();
 
     QFile file("fetched_data.json");
     if (file.open(QIODevice::WriteOnly)) {

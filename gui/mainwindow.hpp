@@ -20,12 +20,13 @@ public:
 
 private slots:
     void onCreateButtonClicked();
-    void onPrintButtonClicked();
 
 private:
     Ui::MainWindow *ui;
     std::unique_ptr<CreateDialog> m_create_dialog;
     AssetManager *m_asset_manager;
+
+    void updateTable();
 };
 
 #endif // MAINWINDOW_HPP

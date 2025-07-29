@@ -19,6 +19,7 @@ public:
 
 signals:
     void assetDataFetched(const std::shared_ptr<QJsonObject> &data);
+    void assetUpdated();
 
 private slots:
     void onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data);

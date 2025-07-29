@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_asset_manager = new AssetManager(this);
     connect(ui->createButton, &QPushButton::clicked, this, &MainWindow::onCreateButtonClicked);
 
-    ui->tableWidget->setColumnCount(8);
+    ui->tableWidget->setColumnCount(9);
     QStringList labels;
     labels << "Sembol"
         << "İsim"
@@ -17,7 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
         << "Alış Fiyatı"
         << "Satış Tarihi"
         << "Satış Fiyatı"
-        << "Durum";
+        << "Durum"
+        << "Kayıt No";
     ui->tableWidget->setHorizontalHeaderLabels(labels);
     ui->tableWidget->resizeColumnsToContents();
     updateTable();
@@ -83,6 +84,10 @@ void MainWindow::updateTable()
         item = new QTableWidgetItem(asset.getStatus());
         item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 7, item);
+        
+        item = new QTableWidgetItem(QString::number(asset.getId()));
+        item->setTextAlignment(Qt::AlignCenter);
+        ui->tableWidget->setItem(currentRow, 8, item);
     }
 
     ui->tableWidget->resizeColumnsToContents();

@@ -15,11 +15,13 @@ void CreateDialog::onOkClicked()
     QString nameStr = name();
     double price = buyPrice();
     QDate date = buyDate();
+    int quantity = ui->quantitySpinBox->value();
 
     Asset newAsset(symbolStr.toStdString(),
                    nameStr.toStdString(),
                    date,
-                   price);
+                   price,
+                   quantity);
     emit assetCreated(newAsset);
     accept();
 }

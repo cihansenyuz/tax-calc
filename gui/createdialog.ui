@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>600</width>
     <height>300</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Symbol - Name - Buy Price - Buy Date</string>
+      <string>Sembol - İsim - Miktar - Alış Fiyatı - Alış Tarihi</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -25,20 +25,23 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2,1,1,1">
      <item>
       <widget class="QLineEdit" name="symbolLineEdit">
        <property name="text">
-        <string>Enter symbol</string>
+        <string>sembol?</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="nameLineEdit">
        <property name="text">
-        <string>Enter name</string>
+        <string>isim?</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="quantitySpinBox"/>
      </item>
      <item>
       <widget class="QDoubleSpinBox" name="buyPriceSpinBox">

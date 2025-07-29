@@ -22,6 +22,10 @@ public:
                      << "Name:" << QString::fromStdString(asset.getSymbolName())
                      << "Buy Price:" << asset.getBuyPrice()
                      << "Buy Date:" << asset.getBuyDate()
+                     << "Quantity:" << asset.getQuantity()
+                     << "Sell Date:" << asset.getSellDate()
+                     << "Sell Price:" << asset.getSellPrice()
+                     << "Status:" << asset.getStatus()
                      << "Inflation Index:" << asset.getInflationIndex()
                      << "Exchange Rate:" << asset.getExchangeRate();
         }

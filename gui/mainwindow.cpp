@@ -33,10 +33,9 @@ void MainWindow::onCreateButtonClicked()
 {
     if (!m_create_dialog) {
         m_create_dialog = std::make_unique<CreateDialog>(this);
-        connect(m_create_dialog.get(), &CreateDialog::assetCreated, this,
-                [this](const Asset &new_asset) {
-            m_asset_manager->addAsset(new_asset);
-        });
+        connect(m_create_dialog.get(), &CreateDialog::assetCreated,
+                m_asset_manager, &AssetManager::addAsset, Qt::SingleShotConnection);
+
         m_create_dialog->exec();
         m_create_dialog.reset();
 

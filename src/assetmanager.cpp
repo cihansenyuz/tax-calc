@@ -10,11 +10,29 @@ AssetManager::AssetManager(QObject *parent)
     m_http_manager->setKey(API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
+    
+    m_asset_db = new AssetDatabase("assets.db");
+    m_asset_db->initAssetTable();
 }
 
 AssetManager::~AssetManager() {
     delete m_evds_fetcher;
     delete m_http_manager;
+    delete m_asset_db;
+}
+
+bool AssetManager::updateAssetInDb(const Asset& asset){
+    return m_asset_db && m_asset_db->updateAsset(asset);
+}
+
+bool AssetManager::saveAssetToDb(const Asset& asset) {
+    return m_asset_db && m_asset_db->saveAsset(asset);
+}
+
+bool AssetManager::loadAssetsFromDb() {
+    if (!m_asset_db) return false;
+    m_assets = m_asset_db->loadAssets();
+    return true;
 }
 
 void AssetManager::addAsset(const Asset& asset) {

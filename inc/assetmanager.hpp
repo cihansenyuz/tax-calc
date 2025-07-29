@@ -3,6 +3,7 @@
 #include <vector>
 #include <QObject>
 #include "asset.hpp"
+#include "database/assetdatabase.hpp"
 
 class AssetManager : public QObject {
     Q_OBJECT
@@ -17,6 +18,10 @@ public:
     size_t size() const { return m_assets.size(); }
     bool empty() const { return m_assets.empty(); }
 
+    bool saveAssetToDb(const Asset& asset);
+    bool updateAssetInDb(const Asset& asset);
+    bool loadAssetsFromDb();
+
 signals:
     void assetDataFetched(const std::shared_ptr<QJsonObject> &data);
     void assetUpdated();
@@ -29,5 +34,6 @@ private:
     Asset m_asset_to_be_updated;
     class HttpManager *m_http_manager;
     class EvdsFetcher *m_evds_fetcher;
+    class AssetDatabase *m_asset_db;
     static constexpr const char* API_KEY = "HSzat3MFdF";
 };

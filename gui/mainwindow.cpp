@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
         << "Durum";
     ui->tableWidget->setHorizontalHeaderLabels(labels);
     ui->tableWidget->resizeColumnsToContents();
+    updateTable();
 }
 
 MainWindow::~MainWindow()
@@ -39,7 +40,7 @@ void MainWindow::onCreateButtonClicked()
         m_create_dialog->exec();
         m_create_dialog.reset();
 
-        connect(m_asset_manager, &AssetManager::assetUpdated,
+        connect(m_asset_manager, &AssetManager::databaseReady,
                 this, &MainWindow::updateTable, Qt::SingleShotConnection);
     }
 }

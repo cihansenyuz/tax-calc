@@ -1,6 +1,8 @@
 #pragma once
 #include <QSqlDatabase>
 #include <QString>
+#include <vector>
+#include "inc/asset.hpp"
 
 class AssetDatabase {
 public:
@@ -9,6 +11,10 @@ public:
 
     bool isOpen() const;
     bool initAssetTable();
+
+    bool saveAsset(const Asset& asset);
+    bool updateAsset(const Asset& asset);
+    std::vector<Asset> loadAssets();
 
 private:
     QSqlDatabase m_db;

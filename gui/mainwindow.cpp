@@ -8,6 +8,18 @@ MainWindow::MainWindow(QWidget *parent)
     m_asset_manager = new AssetManager(this);
     connect(ui->createButton, &QPushButton::clicked, this, &MainWindow::onCreateButtonClicked);
     connect(ui->printButton, &QPushButton::clicked, this, &MainWindow::onPrintButtonClicked);
+
+    ui->tableWidget->setColumnCount(8);
+    QStringList labels;
+    labels << "Sembol"
+        << "İsim"
+        << "Adet"
+        << "Alış Tarihi"
+        << "Alış Fiyatı"
+        << "Satış Tarihi"
+        << "Satış Fiyatı"
+        << "Durum";
+    ui->tableWidget->setHorizontalHeaderLabels(labels);
 }
 
 MainWindow::~MainWindow()
@@ -31,6 +43,39 @@ void MainWindow::onCreateButtonClicked()
 
 void MainWindow::onPrintButtonClicked()
 {
-    m_asset_manager->printAssets();
-    qDebug() << "Total assets:" << m_asset_manager->size();
+    ui->tableWidget->clearContents();
+
+    unsigned int rowCount = m_asset_manager->size();
+    ui->tableWidget->setRowCount(rowCount);
+
+    for (unsigned int currentRow = 0; currentRow < rowCount; currentRow++)
+    {
+        const Asset &asset = m_asset_manager->getAssets().at(currentRow);
+
+        QTableWidgetItem *item = new QTableWidgetItem(QString::fromStdString(asset.getSymbol()));
+        ui->tableWidget->setItem(currentRow, 0, item);
+
+        item = new QTableWidgetItem(QString::fromStdString(asset.getSymbolName()));
+        ui->tableWidget->setItem(currentRow, 1, item);
+
+        item = new QTableWidgetItem(QString::number(asset.getQuantity()));
+        ui->tableWidget->setItem(currentRow, 2, item);
+
+        item = new QTableWidgetItem(asset.getBuyDate());
+        ui->tableWidget->setItem(currentRow, 3, item);
+
+        item = new QTableWidgetItem(QString::number(asset.getBuyPrice()));
+        ui->tableWidget->setItem(currentRow, 4, item);
+
+        item = new QTableWidgetItem(asset.getSellDate());
+        ui->tableWidget->setItem(currentRow, 5, item);
+
+        item = new QTableWidgetItem(QString::number(asset.getSellPrice()));
+        ui->tableWidget->setItem(currentRow, 6, item);
+
+        item = new QTableWidgetItem(asset.getStatus());
+        ui->tableWidget->setItem(currentRow, 7, item);
+    }
+
+    ui->tableWidget->resizeColumnsToContents();
 }

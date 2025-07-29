@@ -16,20 +16,6 @@ public:
     void clear() { m_assets.clear(); }
     size_t size() const { return m_assets.size(); }
     bool empty() const { return m_assets.empty(); }
-    void printAssets() const {
-        for (const auto& asset : m_assets) {
-            qDebug() << "Asset Symbol:" << QString::fromStdString(asset.getSymbol())
-                     << "Name:" << QString::fromStdString(asset.getSymbolName())
-                     << "Buy Price:" << asset.getBuyPrice()
-                     << "Buy Date:" << asset.getBuyDate()
-                     << "Quantity:" << asset.getQuantity()
-                     << "Sell Date:" << asset.getSellDate()
-                     << "Sell Price:" << asset.getSellPrice()
-                     << "Status:" << asset.getStatus()
-                     << "Inflation Index:" << asset.getInflationIndex()
-                     << "Exchange Rate:" << asset.getExchangeRate();
-        }
-    }
 
 signals:
     void assetDataFetched(const std::shared_ptr<QJsonObject> &data);

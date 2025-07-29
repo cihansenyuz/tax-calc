@@ -14,32 +14,29 @@
    <string>Vergi Hesaplayıcı</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="createButton">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>380</y>
-      <width>94</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Yeni Kayıt</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="printButton">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>460</y>
-      <width>94</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Listele</string>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTableWidget" name="tableWidget"/>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="printButton">
+        <property name="text">
+         <string>Listele</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="createButton">
+        <property name="text">
+         <string>Yeni Kayıt</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

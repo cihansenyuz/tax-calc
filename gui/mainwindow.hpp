@@ -6,6 +6,7 @@
 #include "../inc/assetmanager.hpp"
 #include "../inc/network/evdsfetcher.h"
 #include "../inc/network/httpmanager.h"
+#include "transactiontable.hpp"
 #include "createdialog.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -25,8 +26,7 @@ private:
     Ui::MainWindow *ui;
     std::unique_ptr<CreateDialog> m_create_dialog;
     AssetManager *m_asset_manager;
-
-    void updateTable();
+    TransactionTable m_table{this};
 };
 
 #endif // MAINWINDOW_HPP

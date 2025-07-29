@@ -29,7 +29,7 @@ set(PROJECT_SOURCES
         gui/mainwindow.ui
         gui/mainwindow.cpp
         gui/mainwindow.hpp
-
+        gui/transactiontable.hpp
         gui/createdialog.ui
         gui/createdialog.cpp
         gui/createdialog.hpp

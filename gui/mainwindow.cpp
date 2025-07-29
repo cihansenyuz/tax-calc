@@ -8,20 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_asset_manager = new AssetManager(this);
     connect(ui->createButton, &QPushButton::clicked, this, &MainWindow::onCreateButtonClicked);
 
-    ui->tableWidget->setColumnCount(9);
-    QStringList labels;
-    labels << "Sembol"
-        << "İsim"
-        << "Adet"
-        << "Alış Tarihi"
-        << "Alış Fiyatı"
-        << "Satış Tarihi"
-        << "Satış Fiyatı"
-        << "Durum"
-        << "Kayıt No";
-    ui->tableWidget->setHorizontalHeaderLabels(labels);
-    ui->tableWidget->resizeColumnsToContents();
-    updateTable();
+    qobject_cast<QVBoxLayout*>(ui->centralwidget->layout())->insertWidget(0, &m_table);
+    m_table.refresh(m_asset_manager->getAssets());
 }
 
 MainWindow::~MainWindow()
@@ -37,58 +25,9 @@ void MainWindow::onCreateButtonClicked()
         connect(m_create_dialog.get(), &CreateDialog::assetCreated,
                 m_asset_manager, &AssetManager::openTransaction, Qt::SingleShotConnection);
         connect(m_asset_manager, &AssetManager::databaseReady,
-                this, &MainWindow::updateTable, Qt::SingleShotConnection);
+                this, [this](){ m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
 
         m_create_dialog->exec();
         m_create_dialog.reset();
     }
-}
-
-void MainWindow::updateTable()
-{
-    ui->tableWidget->clearContents();
-
-    unsigned int rowCount = m_asset_manager->size();
-    ui->tableWidget->setRowCount(rowCount);
-
-    for (unsigned int currentRow = 0; currentRow < rowCount; currentRow++)
-    {
-        const Asset &asset = m_asset_manager->getAssets().at(currentRow);
-
-        QTableWidgetItem *item = new QTableWidgetItem(QString::fromStdString(asset.getSymbol()));
-        ui->tableWidget->setItem(currentRow, 0, item);
-
-        item = new QTableWidgetItem(QString::fromStdString(asset.getSymbolName()));
-        ui->tableWidget->setItem(currentRow, 1, item);
-
-        item = new QTableWidgetItem(QString::number(asset.getQuantity()));
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 2, item);
-
-        item = new QTableWidgetItem(asset.getBuyDate());
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 3, item);
-
-        item = new QTableWidgetItem(QString::number(asset.getBuyPrice()));
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 4, item);
-
-        item = new QTableWidgetItem(asset.getSellDate());
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 5, item);
-
-        item = new QTableWidgetItem(QString::number(asset.getSellPrice()));
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 6, item);
-
-        item = new QTableWidgetItem(asset.getStatus());
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 7, item);
-        
-        item = new QTableWidgetItem(QString::number(asset.getId()));
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(currentRow, 8, item);
-    }
-
-    ui->tableWidget->resizeColumnsToContents();
 }

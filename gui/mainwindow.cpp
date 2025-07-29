@@ -62,21 +62,27 @@ void MainWindow::updateTable()
         ui->tableWidget->setItem(currentRow, 1, item);
 
         item = new QTableWidgetItem(QString::number(asset.getQuantity()));
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 2, item);
 
         item = new QTableWidgetItem(asset.getBuyDate());
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 3, item);
 
         item = new QTableWidgetItem(QString::number(asset.getBuyPrice()));
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 4, item);
 
         item = new QTableWidgetItem(asset.getSellDate());
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 5, item);
 
         item = new QTableWidgetItem(QString::number(asset.getSellPrice()));
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 6, item);
 
         item = new QTableWidgetItem(asset.getStatus());
+        item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(currentRow, 7, item);
     }
 

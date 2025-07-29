@@ -114,10 +114,10 @@ std::vector<Asset> AssetDatabase::loadAssets() {
             query.value(0).toInt(), // id
             query.value(1).toString().toStdString(), // symbol
             query.value(2).toString().toStdString(), // symbolName
-            QDate::fromString(query.value(3).toString(), Qt::ISODate), // buyDate
+            QDate::fromString(query.value(3).toString(), "dd-MM-yyyy"), // buyDate
             query.value(4).toDouble(), // buyPrice
             query.value(5).toInt(), // quantity
-            QDate::fromString(query.value(6).toString(), Qt::ISODate), // sellDate
+            QDate::fromString(query.value(6).toString(), "dd-MM-yyyy"), // sellDate
             query.value(7).toDouble(), // sellPrice
             query.value(8).toString() // status
         );

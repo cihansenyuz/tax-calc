@@ -2,7 +2,7 @@
 #include <QSqlDatabase>
 #include <QString>
 #include <vector>
-#include "inc/asset.hpp"
+#include "../asset.hpp"
 
 class AssetDatabase {
 public:

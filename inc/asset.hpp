@@ -19,6 +19,7 @@ private:
     double m_exchangeRateAtBuy;
     double m_inflationIndexAtSell;
     double m_exchangeRateAtSell;
+    double m_tax;
 
 public:
     Asset() = default;
@@ -34,7 +35,8 @@ public:
           double inflationIndexAtBuy = 0.0,
           double exchangeRateAtBuy = 0.0,
           double inflationIndexAtSell = 0.0,
-          double exchangeRateAtSell = 0.0)
+          double exchangeRateAtSell = 0.0,
+          double tax = 0.0)
         : m_id(id),
           m_symbol(symbol),
           m_symbolName(symbolName),
@@ -47,7 +49,8 @@ public:
           m_inflationIndexAtBuy(inflationIndexAtBuy),
           m_exchangeRateAtBuy(exchangeRateAtBuy),
           m_inflationIndexAtSell(inflationIndexAtSell),
-          m_exchangeRateAtSell(exchangeRateAtSell) {}
+          m_exchangeRateAtSell(exchangeRateAtSell),
+          m_tax(tax) {}
 
     static Asset createWithUniqueId(
            const std::string& symbol,
@@ -63,7 +66,6 @@ public:
     }
 
     int getId() const { return m_id; }
-    void setId(int id) { m_id = id; }
     std::string getSymbol() const { return m_symbol; }
     std::string getSymbolName() const { return m_symbolName; }
     QString getBuyDate() const { return m_buyDate.toString("dd-MM-yyyy"); }
@@ -76,7 +78,9 @@ public:
     double getExchangeRateAtBuy() const { return m_exchangeRateAtBuy; }
     double getInflationIndexAtSell() const { return m_inflationIndexAtSell; }
     double getExchangeRateAtSell() const { return m_exchangeRateAtSell; }
-
+    double getTax() const { return m_tax; }
+    
+    void setId(int id) { m_id = id; }
     void setSymbol(const std::string& s) { m_symbol = s; }
     void setSymbolName(const std::string& n) { m_symbolName = n; }
     void setBuyPrice(double p) { m_buyPrice = p; }
@@ -88,4 +92,5 @@ public:
     void setExchangeRateAtBuy(double r) { m_exchangeRateAtBuy = r; }
     void setInflationIndexAtSell(double i) { m_inflationIndexAtSell = i; }
     void setExchangeRateAtSell(double r) { m_exchangeRateAtSell = r; }
+    void setTax(double t) { m_tax = t; }
 };

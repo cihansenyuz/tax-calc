@@ -1,6 +1,7 @@
 #include "../inc/assetmanager.hpp"
 #include "../inc/network/evdsfetcher.h"
 #include "../inc/network/httpmanager.h"
+#include "../inc/calculator.hpp"
 #include <QDebug>
 
 AssetManager::AssetManager(QObject *parent)
@@ -12,7 +13,9 @@ AssetManager::AssetManager(QObject *parent)
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
     
     m_asset_db = & AssetDatabase::getInstance("assets.db");
-    m_asset_db->initAssetTable();
+    if(!m_asset_db->initAssetTable())
+        throw std::runtime_error("Failed to initialize asset database table");
+
     m_assets = m_asset_db->loadAssets();
 }
 
@@ -21,24 +24,10 @@ AssetManager::~AssetManager() {
     delete m_http_manager;
 }
 
-bool AssetManager::updateAssetInDb(const Asset& asset){
-    return m_asset_db && m_asset_db->updateAsset(asset);
-}
-
-bool AssetManager::saveAssetToDb(const Asset& asset) {
-    return m_asset_db && m_asset_db->saveAsset(asset);
-}
-
-bool AssetManager::loadAssetsFromDb() {
-    if (!m_asset_db) return false;
-    m_assets = m_asset_db->loadAssets();
-    return true;
-}
-
 void AssetManager::openTransaction(const Asset& asset) {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated = asset;
-
+    
     QString startDate = asset.getBuyDate();
     QString endDate = startDate;
     m_evds_fetcher->fetch(EvdsFetcher::SERIES, startDate, endDate);
@@ -51,7 +40,10 @@ void AssetManager::openTransaction(const Asset& asset) {
     m_asset_to_be_updated.setInflationIndexAtBuy(m_data_to_be_updated.second);
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
     m_assets.push_back(m_asset_to_be_updated);
-    m_asset_db->saveAsset(m_asset_to_be_updated);
+    qDebug() << "Transaction opened for asset:" << m_asset_to_be_updated.getSymbol();
+
+    if(!m_asset_db->saveAsset(m_asset_to_be_updated))
+        throw std::runtime_error("Failed to save asset to database");
 
     emit databaseReady();
 }
@@ -70,9 +62,8 @@ void AssetManager::closeTransaction(const Asset& asset){
 
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
-    // @TODO
-    // Here you can implement any logic needed to finalize the transaction
-    // For now, we just reset the data to be updated
+    
+    m_asset_to_be_updated.setTax(Calculator::calculateTax(m_asset_to_be_updated));
 
     for(auto& asset : m_assets){
         if (asset.getId() == m_asset_to_be_updated.getId()) {
@@ -80,7 +71,10 @@ void AssetManager::closeTransaction(const Asset& asset){
             break;
         }
     }
-    m_asset_db->updateAsset(m_asset_to_be_updated);
+
+    if(!m_asset_db->updateAsset(m_asset_to_be_updated))
+        throw std::runtime_error("Failed to update asset in database");
+
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
     
     qDebug() << "Transaction closed for asset:" << asset.getSymbol();
@@ -115,7 +109,7 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
     }
 
     m_data_to_be_updated = {usdValue, tufeValue};
-    m_condition.notify_all();
+    m_condition.notify_one();
 
     // QFile file("fetched_data.json");
     // if (file.open(QIODevice::WriteOnly)) {

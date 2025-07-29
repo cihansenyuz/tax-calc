@@ -25,7 +25,9 @@ void MainWindow::onCreateButtonClicked()
         connect(m_create_dialog.get(), &CreateDialog::assetCreated,
                 m_asset_manager, &AssetManager::openTransaction, Qt::SingleShotConnection);
         connect(m_asset_manager, &AssetManager::databaseReady,
-                this, [this](){ m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
+                this, [this](){ 
+                    qDebug() << "Database is ready, refreshing table.";
+                    m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
 
         m_create_dialog->exec();
         m_create_dialog.reset();

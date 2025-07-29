@@ -25,6 +25,7 @@ set(PROJECT_SOURCES
         inc/network/evdsfetcher.h
         inc/database/assetdatabase.hpp
         inc/assetmanager.hpp
+        inc/calculator.hpp
 
         gui/mainwindow.ui
         gui/mainwindow.cpp

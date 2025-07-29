@@ -21,10 +21,6 @@ public:
     size_t size() const { return m_assets.size(); }
     bool empty() const { return m_assets.empty(); }
 
-    bool saveAssetToDb(const Asset& asset);
-    bool updateAssetInDb(const Asset& asset);
-    bool loadAssetsFromDb();
-
 signals:
     void databaseReady();
 
@@ -34,7 +30,7 @@ private slots:
 private:
     std::vector<Asset> m_assets;
     Asset m_asset_to_be_updated;
-    std::pair<double, double> m_data_to_be_updated; // (USD, TUFE)
+    std::pair<double, double> m_data_to_be_updated{0.0, 0.0}; // (USD, TUFE)
     std::mutex m_mutex;
     std::condition_variable m_condition;
     class HttpManager *m_http_manager;

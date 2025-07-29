@@ -46,7 +46,8 @@ bool AssetDatabase::initAssetTable() {
         "inflationIndexAtBuy REAL,"
         "exchangeRateAtBuy REAL,"
         "inflationIndexAtSell REAL,"
-        "exchangeRateAtSell REAL"
+        "exchangeRateAtSell REAL,"
+        "tax REAL"
         ");";
     if (!query.exec(createTable)) {
         qWarning() << "Failed to create assets table:" << query.lastError().text();
@@ -58,8 +59,8 @@ bool AssetDatabase::initAssetTable() {
 bool AssetDatabase::saveAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
     query.addBindValue(asset.getId());
@@ -75,6 +76,7 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
     query.addBindValue(asset.getExchangeRateAtBuy());
     query.addBindValue(asset.getInflationIndexAtSell());
     query.addBindValue(asset.getExchangeRateAtSell());
+    query.addBindValue(asset.getTax());
     if (!query.exec()) {
         qWarning() << "Failed to insert asset:" << query.lastError().text();
         return false;
@@ -85,7 +87,7 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
 bool AssetDatabase::updateAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndexAtBuy=?, exchangeRateAtBuy=?, inflationIndexAtSell=?, exchangeRateAtSell=? WHERE id=?"
+        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndexAtBuy=?, exchangeRateAtBuy=?, inflationIndexAtSell=?, exchangeRateAtSell=?, tax=? WHERE id=?"
     );
     query.addBindValue(QString::fromStdString(asset.getSymbol()));
     query.addBindValue(QString::fromStdString(asset.getSymbolName()));
@@ -111,7 +113,7 @@ std::vector<Asset> AssetDatabase::loadAssets() {
     std::vector<Asset> assets;
     QSqlQuery query(m_db);
 
-    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell FROM assets")) {
+    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax FROM assets")) {
         qWarning() << "Failed to load assets:" << query.lastError().text();
         return assets;
     }
@@ -129,7 +131,8 @@ std::vector<Asset> AssetDatabase::loadAssets() {
             query.value(9).toDouble(), // inflationIndexAtBuy
             query.value(10).toDouble(), // exchangeRateAtBuy
             query.value(11).toDouble(), // inflationIndexAtSell
-            query.value(12).toDouble() // exchangeRateAtSell
+            query.value(12).toDouble(), // exchangeRateAtSell
+            query.value(13).toDouble() // tax
         );
         assets.push_back(asset);
     }

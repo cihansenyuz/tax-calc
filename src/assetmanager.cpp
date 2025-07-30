@@ -8,7 +8,7 @@ AssetManager::AssetManager(QObject *parent)
     : QObject(parent)
 {
     m_http_manager = new HttpManager();
-    m_http_manager->setKey(API_KEY);
+    m_http_manager->setKey(EvdsFetcher::API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
     

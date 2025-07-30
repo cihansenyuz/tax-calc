@@ -14,6 +14,7 @@ public:
     void fetch(const QString &series, const QString &startDate, const QString &endDate);
 
     static constexpr const char* SERIES = "TP.DK.USD.A-TP.TUFE1YI.T1";
+    static constexpr const char* API_KEY = "HSzat3MFdF";
 
 signals:
     void evdsDataFetched(const std::shared_ptr<QJsonObject> &data);

@@ -42,7 +42,6 @@ private:
     class HttpManager *m_http_manager;
     class EvdsFetcher *m_evds_fetcher;
     class AssetDatabase *m_asset_db;
-    static constexpr const char* API_KEY = "HSzat3MFdF";
 
     void processOpenTransaction();
     void processCloseTransaction();

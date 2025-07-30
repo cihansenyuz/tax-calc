@@ -27,39 +27,42 @@ AssetManager::~AssetManager() {
 void AssetManager::openTransaction(const Asset& asset) {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated = asset;
+    m_currentTransactionType = TransactionType::Open;
     
     QString startDate = asset.getBuyDate();
     QString endDate = startDate;
     m_evds_fetcher->fetch(EvdsFetcher::SERIES, startDate, endDate);
-    
-    m_condition.wait(lock, [this](){
-        return m_data_to_be_updated.first != 0.0 && m_data_to_be_updated.second != 0.0;
-    });
+}
+
+void AssetManager::processOpenTransaction() {
+    std::unique_lock<std::mutex> lock(m_mutex);
 
     m_asset_to_be_updated.setExchangeRateAtBuy(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtBuy(m_data_to_be_updated.second);
-    m_data_to_be_updated = {0.0, 0.0}; // Reset after use
+    
     m_assets.push_back(m_asset_to_be_updated);
-    qDebug() << "Transaction opened for asset:" << m_asset_to_be_updated.getSymbol();
-
+    
     if(!m_asset_db->saveAsset(m_asset_to_be_updated))
         throw std::runtime_error("Failed to save asset to database");
 
+    m_data_to_be_updated = {0.0, 0.0}; // Reset after use
+    // qDebug() << "Transaction opened for asset:" << m_asset_to_be_updated.getSymbol();
+    
     emit databaseReady();
 }
 
 void AssetManager::closeTransaction(const Asset& asset){
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated = asset;
+    m_currentTransactionType = TransactionType::Close;
 
     QString startDate = asset.getSellDate();
     QString endDate = startDate;
     m_evds_fetcher->fetch(EvdsFetcher::SERIES, startDate, endDate);
+}
 
-    m_condition.wait(lock, [this](){
-        return m_data_to_be_updated.first != 0.0 && m_data_to_be_updated.second != 0.0;
-    });
-
+void AssetManager::processCloseTransaction(){
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
     
@@ -77,13 +80,17 @@ void AssetManager::closeTransaction(const Asset& asset){
 
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
     
-    qDebug() << "Transaction closed for asset:" << asset.getSymbol();
+    // qDebug() << "Transaction closed for asset:" << m_asset_to_be_updated.getSymbol();
     emit databaseReady();
 }
 
 void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    qDebug() << "AssetManager received fetched data";
+    QFile file("fetched_data.json");
+    if (file.open(QIODevice::WriteOnly)) {
+        QJsonDocument doc(*data);
+        file.write(doc.toJson());
+        file.close();
+    }
 
     double usdValue = 0.0;
     double tufeValue = 0.0;
@@ -108,13 +115,20 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
         }
     }
 
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_data_to_be_updated = {usdValue, tufeValue};
-    m_condition.notify_one();
+    lock.unlock();
 
-    // QFile file("fetched_data.json");
-    // if (file.open(QIODevice::WriteOnly)) {
-    //     QJsonDocument doc(*data);
-    //     file.write(doc.toJson());
-    //     file.close();
-    // }
+    switch (m_currentTransactionType) {
+        case TransactionType::Open:
+            processOpenTransaction();
+            break;
+        case TransactionType::Close:
+            processCloseTransaction();
+            break;
+        case TransactionType::None:
+            qWarning() << "Received data with no active transaction";
+            break;
+    }
+    m_currentTransactionType = TransactionType::None;
 }

@@ -10,6 +10,12 @@
 class AssetManager : public QObject {
     Q_OBJECT
 public:
+    enum class TransactionType {
+        None,
+        Open,
+        Close
+    };
+
     explicit AssetManager(QObject *parent = nullptr);
     ~AssetManager();
 
@@ -32,9 +38,12 @@ private:
     Asset m_asset_to_be_updated;
     std::pair<double, double> m_data_to_be_updated{0.0, 0.0}; // (USD, TUFE)
     std::mutex m_mutex;
-    std::condition_variable m_condition;
+    TransactionType m_currentTransactionType;
     class HttpManager *m_http_manager;
     class EvdsFetcher *m_evds_fetcher;
     class AssetDatabase *m_asset_db;
     static constexpr const char* API_KEY = "HSzat3MFdF";
+
+    void processOpenTransaction();
+    void processCloseTransaction();
 };

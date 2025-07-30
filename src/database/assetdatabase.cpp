@@ -111,6 +111,7 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
 }
 
 std::vector<Asset> AssetDatabase::loadAssets() {
+    qDebug() << "Loading assets from database...";
     std::vector<Asset> assets;
     QSqlQuery query(m_db);
 
@@ -135,8 +136,28 @@ std::vector<Asset> AssetDatabase::loadAssets() {
             query.value(12).toDouble(), // exchangeRateAtSell
             query.value(13).toDouble() // tax
         );
+        
+        // Print each property of the loaded asset
+        qDebug() << "=== Loaded Asset Properties ===";
+        qDebug() << "ID:" << asset.getId();
+        qDebug() << "Symbol:" << QString::fromStdString(asset.getSymbol());
+        qDebug() << "Symbol Name:" << QString::fromStdString(asset.getSymbolName());
+        qDebug() << "Buy Date:" << asset.getBuyDate();
+        qDebug() << "Buy Price:" << asset.getBuyPrice();
+        qDebug() << "Quantity:" << asset.getQuantity();
+        qDebug() << "Sell Date:" << asset.getSellDate();
+        qDebug() << "Sell Price:" << asset.getSellPrice();
+        qDebug() << "Status:" << asset.getStatus();
+        qDebug() << "Inflation Index At Buy:" << asset.getInflationIndexAtBuy();
+        qDebug() << "Exchange Rate At Buy:" << asset.getExchangeRateAtBuy();
+        qDebug() << "Inflation Index At Sell:" << asset.getInflationIndexAtSell();
+        qDebug() << "Exchange Rate At Sell:" << asset.getExchangeRateAtSell();
+        qDebug() << "Tax:" << asset.getTax();
+        qDebug() << "===============================";
+        
         assets.push_back(asset);
     }
+    qDebug() << "Successfully loaded" << assets.size() << "assets from database.";
     return assets;
 }
 

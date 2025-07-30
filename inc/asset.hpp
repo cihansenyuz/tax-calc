@@ -20,6 +20,7 @@ private:
     double m_inflationIndexAtSell;
     double m_exchangeRateAtSell;
     double m_tax;
+    double m_taxBase;
 
 public:
     Asset() = default;
@@ -36,7 +37,8 @@ public:
           double exchangeRateAtBuy = 0.0,
           double inflationIndexAtSell = 0.0,
           double exchangeRateAtSell = 0.0,
-          double tax = 0.0)
+          double tax = 0.0,
+          double taxBase = 0.0)
         : m_id(id),
           m_symbol(symbol),
           m_symbolName(symbolName),
@@ -50,7 +52,8 @@ public:
           m_exchangeRateAtBuy(exchangeRateAtBuy),
           m_inflationIndexAtSell(inflationIndexAtSell),
           m_exchangeRateAtSell(exchangeRateAtSell),
-          m_tax(tax) {}
+          m_tax(tax),
+          m_taxBase(taxBase) {}
 
     static Asset createWithUniqueId(
            const std::string& symbol,
@@ -80,6 +83,7 @@ public:
     double getInflationIndexAtSell() const { return m_inflationIndexAtSell; }
     double getExchangeRateAtSell() const { return m_exchangeRateAtSell; }
     double getTax() const { return m_tax; }
+    double getTaxBase() const { return m_taxBase; }
     
     void setId(int id) { m_id = id; }
     void setSymbol(const std::string& s) { m_symbol = s; }
@@ -94,4 +98,5 @@ public:
     void setInflationIndexAtSell(double i) { m_inflationIndexAtSell = i; }
     void setExchangeRateAtSell(double r) { m_exchangeRateAtSell = r; }
     void setTax(double t) { m_tax = t; }
+    void setTaxBase(double tb) { m_taxBase = tb; }
 };

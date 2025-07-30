@@ -47,7 +47,8 @@ bool AssetDatabase::initAssetTable() {
         "exchangeRateAtBuy REAL,"
         "inflationIndexAtSell REAL,"
         "exchangeRateAtSell REAL,"
-        "tax REAL"
+        "tax REAL,"
+        "taxBase REAL"
         ");";
     if (!query.exec(createTable)) {
         qWarning() << "Failed to create assets table:" << query.lastError().text();
@@ -59,8 +60,8 @@ bool AssetDatabase::initAssetTable() {
 bool AssetDatabase::saveAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO assets (id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax, taxBase) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
 
     query.addBindValue(asset.getId());
@@ -77,6 +78,7 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
     query.addBindValue(asset.getInflationIndexAtSell());
     query.addBindValue(asset.getExchangeRateAtSell());
     query.addBindValue(asset.getTax());
+    query.addBindValue(asset.getTaxBase());
     if (!query.exec()) {
         qWarning() << "Failed to insert asset:" << query.lastError().text();
         return false;
@@ -87,7 +89,7 @@ bool AssetDatabase::saveAsset(const Asset& asset) {
 bool AssetDatabase::updateAsset(const Asset& asset) {
     QSqlQuery query(m_db);
     query.prepare(
-        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndexAtBuy=?, exchangeRateAtBuy=?, inflationIndexAtSell=?, exchangeRateAtSell=?, tax=? WHERE id=?"
+        "UPDATE assets SET symbol=?, symbolName=?, buyDate=?, buyPrice=?, quantity=?, sellDate=?, sellPrice=?, status=?, inflationIndexAtBuy=?, exchangeRateAtBuy=?, inflationIndexAtSell=?, exchangeRateAtSell=?, tax=?, taxBase=? WHERE id=?"
     );
     query.addBindValue(QString::fromStdString(asset.getSymbol()));
     query.addBindValue(QString::fromStdString(asset.getSymbolName()));
@@ -102,6 +104,7 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
     query.addBindValue(asset.getInflationIndexAtSell());
     query.addBindValue(asset.getExchangeRateAtSell());
     query.addBindValue(asset.getTax());
+    query.addBindValue(asset.getTaxBase());
     query.addBindValue(asset.getId());
     if (!query.exec()) {
         qWarning() << "Failed to update asset:" << query.lastError().text();
@@ -115,7 +118,7 @@ std::vector<Asset> AssetDatabase::loadAssets() {
     std::vector<Asset> assets;
     QSqlQuery query(m_db);
 
-    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax FROM assets")) {
+    if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax, taxBase FROM assets")) {
         qWarning() << "Failed to load assets:" << query.lastError().text();
         return assets;
     }
@@ -134,7 +137,8 @@ std::vector<Asset> AssetDatabase::loadAssets() {
             query.value(10).toDouble(), // exchangeRateAtBuy
             query.value(11).toDouble(), // inflationIndexAtSell
             query.value(12).toDouble(), // exchangeRateAtSell
-            query.value(13).toDouble() // tax
+            query.value(13).toDouble(), // tax
+            query.value(14).toDouble()  // taxBase
         );
         
         // Print each property of the loaded asset
@@ -152,6 +156,7 @@ std::vector<Asset> AssetDatabase::loadAssets() {
         qDebug() << "Exchange Rate At Buy:" << asset.getExchangeRateAtBuy();
         qDebug() << "Inflation Index At Sell:" << asset.getInflationIndexAtSell();
         qDebug() << "Exchange Rate At Sell:" << asset.getExchangeRateAtSell();
+        qDebug() << "Tax Base:" << asset.getTaxBase();
         qDebug() << "Tax:" << asset.getTax();
         qDebug() << "===============================";
         

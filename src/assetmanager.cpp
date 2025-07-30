@@ -46,7 +46,6 @@ void AssetManager::processOpenTransaction() {
         throw std::runtime_error("Failed to save asset to database");
 
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
-    // qDebug() << "Transaction opened for asset:" << m_asset_to_be_updated.getSymbol();
     
     emit databaseReady();
 }
@@ -66,7 +65,7 @@ void AssetManager::processCloseTransaction(){
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
     
-    m_asset_to_be_updated.setTax(Calculator::calculateTax(m_asset_to_be_updated));
+    m_asset_to_be_updated.setTaxBase(Calculator::calculateTaxBase(m_asset_to_be_updated));
 
     for(auto& asset : m_assets){
         if (asset.getId() == m_asset_to_be_updated.getId()) {
@@ -80,7 +79,6 @@ void AssetManager::processCloseTransaction(){
 
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
     
-    // qDebug() << "Transaction closed for asset:" << m_asset_to_be_updated.getSymbol();
     emit databaseReady();
 }
 

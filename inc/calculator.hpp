@@ -6,21 +6,29 @@ class Calculator {
 public:
     static double calculateTax(const Asset &asset){
         double tax = 0.0;
-        // ((sell price - buy price) * (UFE YI at buy date / UFE YI at sell date)) / exchange at sell date
-        // sell price = exchange rate at sell date * sell price
-        // buy price = exchange rate at buy date * buy price + comission
-        double sellPrice = asset.getExchangeRateAtSell() * asset.getSellPrice();
-        double buyPrice = asset.getExchangeRateAtBuy() * asset.getBuyPrice(); // missing comission cost
+        // taxBase = taxbase * taxRate
+        // TO DO: learn taxRate ranges and implement calculation
+        return tax;
+    }
+
+    static double calculateTaxBase(const Asset &asset){
+        double sellPrice = asset.getExchangeRateAtSell() * (asset.getSellPrice() * asset.getQuantity() - 1.5);
+        double buyPrice = asset.getExchangeRateAtBuy() * (asset.getBuyPrice() * asset.getQuantity() + 1.5);
 
         try{
-            tax = (sellPrice - buyPrice) * (asset.getInflationIndexAtBuy() / asset.getInflationIndexAtSell());
-            tax /= asset.getExchangeRateAtSell();
+            double inflationScaler = asset.getInflationIndexAtSell() / asset.getInflationIndexAtBuy();
+            double taxBase = 0.0;
+
+            if(inflationScaler >= 1.1)
+                taxBase = (sellPrice - (buyPrice * inflationScaler));
+            else
+                taxBase = (sellPrice - buyPrice);
+
+            return taxBase;
         }
         catch (const std::exception& e) {
-            qDebug() << "Error calculating tax: " << e.what();
-            return 0.0; // Return 0 if there's an error
+            qDebug() << "Error calculating tax base: " << e.what();
+            return 0.0;
         }
-
-        return tax;
     }
 };

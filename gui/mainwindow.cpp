@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
             QMessageBox::warning(this, "Selection Error", "Please select a transaction to close.");
             return;
         }
-        QTableWidgetItem *item = m_table.item(selectedRow, 8);
+        QTableWidgetItem *item = m_table.item(selectedRow, 0);
         if (!item) {
             QMessageBox::warning(this, "Selection Error", "No valid transaction selected.");
             return;

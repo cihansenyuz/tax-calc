@@ -101,6 +101,7 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
     query.addBindValue(asset.getExchangeRateAtBuy());
     query.addBindValue(asset.getInflationIndexAtSell());
     query.addBindValue(asset.getExchangeRateAtSell());
+    query.addBindValue(asset.getTax());
     query.addBindValue(asset.getId());
     if (!query.exec()) {
         qWarning() << "Failed to update asset:" << query.lastError().text();

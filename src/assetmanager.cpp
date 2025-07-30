@@ -56,8 +56,8 @@ void AssetManager::closeTransaction(const Asset& asset){
     m_asset_to_be_updated = asset;
     m_currentTransactionType = TransactionType::Close;
 
-    QString startDate = asset.getSellDate();
-    QString endDate = startDate;
+    QString startDate = asset.getSellQDate().addMonths(-1).toString("dd-MM-yyyy");
+    QString endDate = asset.getSellDate();
     m_evds_fetcher->fetch(EvdsFetcher::SERIES, startDate, endDate);
 }
 
@@ -131,4 +131,14 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data) {
             break;
     }
     m_currentTransactionType = TransactionType::None;
+}
+
+Asset AssetManager::findAssetById(int id){
+    std::unique_lock<std::mutex> lock(m_mutex);
+    for (const auto& asset : m_assets) {
+        if (asset.getId() == id) {
+            return asset;
+        }
+    }
+    throw std::runtime_error{"Asset with ID " + std::to_string(id) + " not found."};
 }

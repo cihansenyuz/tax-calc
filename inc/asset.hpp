@@ -72,6 +72,7 @@ public:
     double getBuyPrice() const { return m_buyPrice; }
     int getQuantity() const { return m_quantity; }
     QString getSellDate() const { return m_sellDate.isValid() ? m_sellDate.toString("dd-MM-yyyy") : ""; }
+    QDate getSellQDate() const { return m_sellDate; }
     double getSellPrice() const { return m_sellPrice; }
     QString getStatus() const { return m_status; }
     double getInflationIndexAtBuy() const { return m_inflationIndexAtBuy; }

@@ -192,14 +192,18 @@ Asset AssetManager::findAssetById(int id){
 
 void AssetManager::removeAsset(int id)
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    auto it = std::remove_if(m_assets.begin(), m_assets.end(),
-                               [id](const Asset& asset) { return asset.getId() == id; });
-    
-    if (it != m_assets.end()) {
-        m_assets.erase(it, m_assets.end());
-    }
+    if(m_asset_db->deleteAsset(id)) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        auto it = std::remove_if(m_assets.begin(), m_assets.end(),
+                                [id](const Asset& asset) { return asset.getId() == id; });
+        
+        if (it != m_assets.end()) {
+            m_assets.erase(it, m_assets.end());
+        }
 
-    m_asset_db->deleteAsset(id);
-    emit databaseReady();   
+        emit databaseReady();   
+    }
+    else {
+        throw std::runtime_error{"Failed to delete asset with ID " + std::to_string(id) + " from database."};
+    }
 }

@@ -18,7 +18,7 @@ public:
     void SendHttpRequest(const QString &api_query,
                          const QString &key,
                          T* requester_object,
-                         void (T::*slot_function)()){
+                         void (T::*slot_function)(QNetworkReply*)){
         QUrl http_url(QString(HOST) + api_query);
         QNetworkRequest http_request(http_url);
         http_request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -33,17 +33,23 @@ public:
         }
         qDebug() << "#########################################";
 
-        http_reply = GetHttpReply(http_request);
-        connect(http_reply, &QNetworkReply::finished,
-                requester_object, slot_function,
+        QNetworkReply* reply = GetHttpReply(http_request);
+        
+        // Use lambda to capture the reply and pass it to the slot
+        connect(reply, &QNetworkReply::finished, [requester_object, slot_function, reply]() {
+            (requester_object->*slot_function)(reply);
+        });
+        
+        // Auto-delete the reply when finished to prevent memory leaks
+        connect(reply, &QNetworkReply::finished,
+                reply, &QNetworkReply::deleteLater,
                 Qt::SingleShotConnection);
     }
-    QJsonObject ReadBody();
-    int GetHttpStatusCode();
+    QJsonObject ReadBody(QNetworkReply* reply);
+    int GetHttpStatusCode(QNetworkReply* reply);
 
     QNetworkAccessManager http_access_manager;
     QJsonDocument http_body_data;
-    QNetworkReply *http_reply;
 };
 
 #endif // NETWORKCORE_H

@@ -14,7 +14,7 @@ signals:
     void JsonFetched(const std::shared_ptr<QJsonObject> &fetched_data);
 
 private slots:
-    void OnFetchJsonDataReplyRecieved();
+    void OnFetchJsonDataReplyRecieved(QNetworkReply* reply);
 
 private:
     QNetworkReply* GetHttpReply(const QNetworkRequest &request) override;

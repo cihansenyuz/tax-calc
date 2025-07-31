@@ -23,6 +23,7 @@ private slots:
     void onCreateButtonClicked();
     void onCloseTransactionButtonClicked();
     void onDeletePositionButtonClicked();
+    void onPotentialCalculateButtonClicked();
     void onDatabaseReady();
     void onCleanSelectionButtonClicked();
 

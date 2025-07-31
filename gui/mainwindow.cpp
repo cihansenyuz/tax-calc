@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCloseTransactionButtonClicked);
     connect(ui->deletePositionButton, &QPushButton::clicked,
             this, &MainWindow::onDeletePositionButtonClicked);
+    connect(ui->pushButton, &QPushButton::clicked,
+            this, &MainWindow::onPotentialCalculateButtonClicked);
     connect(m_asset_manager, &AssetManager::databaseReady,
             this, &MainWindow::onDatabaseReady);
     connect(ui->cleanSelectionButton, &QPushButton::clicked,
@@ -106,4 +108,25 @@ void MainWindow::onCloseTransactionButtonClicked(){
     selectedAsset.setStatus("Kapalı");
 
     m_asset_manager->closeTransaction(selectedAsset);
+}
+
+void MainWindow::onPotentialCalculateButtonClicked(){
+    if (ui->IDlabel->text().isEmpty()) {
+        QMessageBox::warning(this, "Selection Error", "Please select a position to calculate potential tax.");
+        return;
+    }
+
+    Asset selectedAsset = m_asset_manager->findAssetById(ui->IDlabel->text().toInt());
+    double potentialSellPrice = ui->potantialSellPriceSpinBox->value();
+    QDate currentDate = QDate::currentDate();
+
+    if (potentialSellPrice <= 0) {
+        QMessageBox::warning(this, "Input Error", "Please enter a valid sell price.");
+        return;
+    }
+
+    selectedAsset.setSellDate(currentDate);
+    selectedAsset.setSellPrice(potentialSellPrice);
+
+    m_asset_manager->potentialTransaction(selectedAsset);
 }

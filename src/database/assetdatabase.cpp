@@ -5,8 +5,6 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QString>
-#include "assetdatabase.hpp"
-
 
 AssetDatabase& AssetDatabase::getInstance(const QString& dbPath) {
     static AssetDatabase instance(dbPath);

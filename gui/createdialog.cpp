@@ -19,7 +19,7 @@ void CreateDialog::onOkClicked()
     int quantity = ui->quantitySpinBox->value();
 
     if (symbolStr.isEmpty() || nameStr.isEmpty() || price <= 0 || quantity <= 0) {
-        QMessageBox::warning(this, "Input Error", "Please fill in all fields correctly.");
+        QMessageBox::warning(this, "Giriş Hatası", "Lütfen tüm alanları doğru şekilde doldurun.");
         return;
     }
 

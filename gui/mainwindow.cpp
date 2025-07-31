@@ -130,7 +130,7 @@ void MainWindow::onPotentialCalculateButtonClicked(){
 
     connect(m_asset_manager, &AssetManager::potentialTaxBaseReady,
             this, [this](double potentialTaxBase) {
-                ui->potantialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2));
+                ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2));
             }, Qt::SingleShotConnection);
     m_asset_manager->potentialTransaction(selectedAsset);
 }

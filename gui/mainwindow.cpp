@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCloseTransactionButtonClicked);
     connect(ui->deletePositionButton, &QPushButton::clicked,
             this, &MainWindow::onDeletePositionButtonClicked);
+    connect(m_asset_manager, &AssetManager::databaseReady,
+            this, &MainWindow::onDatabaseReady);
 
     connect(ui->selectButton, &QPushButton::clicked, this, [this]() {
         int selectedRow = m_table.currentRow();
@@ -41,16 +43,18 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::onDatabaseReady()
+{
+    qDebug() << "Database is ready, refreshing table.";
+    m_table.refresh(m_asset_manager->getAssets());
+}
+
 void MainWindow::onCreateButtonClicked()
 {
     if (!m_create_dialog) {
         m_create_dialog = std::make_unique<CreateDialog>(this);
         connect(m_create_dialog.get(), &CreateDialog::assetCreated,
                 m_asset_manager, &AssetManager::openTransaction, Qt::SingleShotConnection);
-        connect(m_asset_manager, &AssetManager::databaseReady,
-                this, [this](){ 
-                    qDebug() << "Database is ready, refreshing table.";
-                    m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
 
         m_create_dialog->exec();
         m_create_dialog.reset();
@@ -65,10 +69,6 @@ void MainWindow::onDeletePositionButtonClicked()
     }
 
     int id = ui->IDlabel->text().toInt();
-    connect(m_asset_manager, &AssetManager::databaseReady,
-            this, [this](){ 
-                qDebug() << "Database is ready, refreshing table.";
-                m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
                 
     try{
         m_asset_manager->removeAsset(id);
@@ -95,11 +95,6 @@ void MainWindow::onCloseTransactionButtonClicked(){
     selectedAsset.setSellDate(sellDate);
     selectedAsset.setSellPrice(sellPrice);
     selectedAsset.setStatus("Kapalı");
-
-    connect(m_asset_manager, &AssetManager::databaseReady,
-            this, [this]() { 
-                qDebug() << "Database is ready, refreshing table.";
-                m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
 
     m_asset_manager->closeTransaction(selectedAsset);
 }

@@ -7,8 +7,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     m_asset_manager = new AssetManager(this);
-    connect(ui->createButton, &QPushButton::clicked, this, &MainWindow::onCreateButtonClicked);
-    connect(ui->closeTransactionButton, &QPushButton::clicked, this, &MainWindow::onCloseTransactionButtonClicked);
+    connect(ui->createButton, &QPushButton::clicked,
+            this, &MainWindow::onCreateButtonClicked);
+    connect(ui->closeTransactionButton, &QPushButton::clicked,
+            this, &MainWindow::onCloseTransactionButtonClicked);
+    connect(ui->deletePositionButton, &QPushButton::clicked,
+            this, &MainWindow::onDeletePositionButtonClicked);
+
     connect(ui->selectButton, &QPushButton::clicked, this, [this]() {
         int selectedRow = m_table.currentRow();
         if (selectedRow < 0) {
@@ -50,6 +55,11 @@ void MainWindow::onCreateButtonClicked()
         m_create_dialog->exec();
         m_create_dialog.reset();
     }
+}
+
+void MainWindow::onDeletePositionButtonClicked()
+{
+    QMessageBox::information(this, "Delete Position", "Delete position button clicked.");
 }
 
 void MainWindow::onCloseTransactionButtonClicked(){

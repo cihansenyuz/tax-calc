@@ -21,6 +21,13 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QPushButton" name="selectButton">
+        <property name="text">
+         <string>Pozisyonu Seç</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="createButton">
         <property name="text">
          <string>Yeni Kayıt</string>
@@ -67,18 +74,22 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="selectButton">
-        <property name="text">
-         <string>Pozisyonu Seç</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="closeTransactionButton">
-        <property name="text">
-         <string>Pozisyonu Kapat</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QPushButton" name="closeTransactionButton">
+          <property name="text">
+           <string>Pozisyonu Kapat</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="deletePositionButton">
+          <property name="text">
+           <string>Pozisyonu Sil</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>

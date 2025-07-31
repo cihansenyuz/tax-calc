@@ -22,6 +22,7 @@ public:
 private slots:
     void onCreateButtonClicked();
     void onCloseTransactionButtonClicked();
+    void onDeletePositionButtonClicked();
 
 private:
     Ui::MainWindow *ui;

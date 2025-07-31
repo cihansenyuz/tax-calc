@@ -99,12 +99,13 @@ void AssetManager::processCloseTransaction(){
 }
 
 void AssetManager::processPotentialTransaction(){
-    // This function will be defined later
     std::unique_lock<std::mutex> lock(m_mutex);
-    // TODO: Implement potential transaction processing logic
-    qDebug() << "Processing potential transaction for asset ID:" << m_asset_to_be_updated.getId();
-    qDebug() << "Succeeded!";
+    m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
+    m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
+    double potentialTaxBase = Calculator::calculateTaxBase(m_asset_to_be_updated);
+
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
+    emit potentialTaxBaseReady(potentialTaxBase);
 }
 
 void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, const QString &seriesCode) {

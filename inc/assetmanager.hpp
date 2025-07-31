@@ -39,6 +39,7 @@ public:
 
 signals:
     void databaseReady();
+    void potentialTaxBaseReady(double potentialTaxBase);
 
 private slots:
     void onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,

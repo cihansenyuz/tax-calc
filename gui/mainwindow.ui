@@ -311,7 +311,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="potantialCalculatedTaxLabel">
+          <widget class="QLabel" name="potentialCalculatedTaxLabel">
            <property name="font">
             <font>
              <pointsize>14</pointsize>

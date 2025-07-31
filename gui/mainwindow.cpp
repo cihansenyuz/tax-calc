@@ -23,12 +23,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->selectButton, &QPushButton::clicked, this, [this]() {
         int selectedRow = m_table.currentRow();
         if (selectedRow < 0) {
-            QMessageBox::warning(this, "Selection Error", "Please select a transaction to close.");
+            QMessageBox::warning(this, "Seçim Hatası", "Lütfen kapatılacak bir işlem seçin.");
             return;
         }
         QTableWidgetItem *item = m_table.item(selectedRow, 0);
         if (!item) {
-            QMessageBox::warning(this, "Selection Error", "No valid transaction selected.");
+            QMessageBox::warning(this, "Seçim Hatası", "Geçerli bir işlem seçilmedi.");
             return;
         }
         Asset selectedAsset = m_asset_manager->findAssetById(item->text().toInt());
@@ -75,7 +75,7 @@ void MainWindow::onCreateButtonClicked()
 void MainWindow::onDeletePositionButtonClicked()
 {
     if(ui->IDlabel->text().isEmpty()) {
-        QMessageBox::warning(this, "Delete Position", "No position selected to delete.");
+        QMessageBox::warning(this, "Pozisyon Sil", "Silinecek pozisyon seçilmedi.");
         return;
     }
 
@@ -84,10 +84,10 @@ void MainWindow::onDeletePositionButtonClicked()
     try{
         m_asset_manager->removeAsset(id);
     } catch (const std::runtime_error& e) {
-        QMessageBox::warning(this, "Delete Position", e.what());
+        QMessageBox::warning(this, "Pozisyon Sil", e.what());
         return;
     }
-    QMessageBox::information(this, "Delete Position", "Position deleted successfully.");
+    QMessageBox::information(this, "Pozisyon Sil", "Pozisyon başarıyla silindi.");
 }
 
 void MainWindow::onCloseTransactionButtonClicked(){
@@ -100,7 +100,8 @@ void MainWindow::onCloseTransactionButtonClicked(){
     QDate sellDate = ui->sellDateEdit->date();
 
     if (sellPrice <= 0 || !sellDate.isValid()) {
-        throw std::invalid_argument("Invalid sell price or date");
+        QMessageBox::warning(this, "Giriş Hatası", "Geçerli bir satış fiyatı veya tarih giriniz.");
+        return;
     }
 
     selectedAsset.setSellDate(sellDate);
@@ -112,7 +113,7 @@ void MainWindow::onCloseTransactionButtonClicked(){
 
 void MainWindow::onPotentialCalculateButtonClicked(){
     if (ui->IDlabel->text().isEmpty()) {
-        QMessageBox::warning(this, "Selection Error", "Please select a position to calculate potential tax.");
+        QMessageBox::warning(this, "Seçim Hatası", "Potansiyel vergi hesaplamak için lütfen bir pozisyon seçin.");
         return;
     }
 
@@ -121,7 +122,7 @@ void MainWindow::onPotentialCalculateButtonClicked(){
     QDate currentDate = QDate::currentDate();
 
     if (potentialSellPrice <= 0) {
-        QMessageBox::warning(this, "Input Error", "Please enter a valid sell price.");
+        QMessageBox::warning(this, "Giriş Hatası", "Lütfen geçerli bir satış fiyatı girin.");
         return;
     }
 

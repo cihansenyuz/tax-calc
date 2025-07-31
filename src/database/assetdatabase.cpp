@@ -5,6 +5,7 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QString>
+#include "assetdatabase.hpp"
 
 
 AssetDatabase& AssetDatabase::getInstance(const QString& dbPath) {
@@ -113,7 +114,20 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
     return true;
 }
 
-std::vector<Asset> AssetDatabase::loadAssets() {
+bool AssetDatabase::deleteAsset(int id)
+{
+    QSqlQuery query(m_db);
+    query.prepare("DELETE FROM assets WHERE id=?");
+    query.addBindValue(id);
+    if (!query.exec()) {
+        qWarning() << "Failed to delete asset:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+std::vector<Asset> AssetDatabase::loadAssets()
+{
     qDebug() << "Loading assets from database...";
     std::vector<Asset> assets;
     QSqlQuery query(m_db);

@@ -16,6 +16,8 @@ public:
 
     bool saveAsset(const Asset& asset);
     bool updateAsset(const Asset& asset);
+    bool deleteAsset(int id);
+    
     std::vector<Asset> loadAssets();
 
 private:

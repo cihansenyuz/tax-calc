@@ -27,6 +27,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
             <widget class="QPushButton" name="createButton">
+             <property name="toolTip">
+              <string>Yeni pozisyon açmak için kayıt oluşturun.</string>
+             </property>
              <property name="text">
               <string>Yeni Kayıt Oluştur</string>
              </property>
@@ -34,6 +37,9 @@
            </item>
            <item>
             <widget class="QPushButton" name="selectButton">
+             <property name="toolTip">
+              <string>Önce tablodan İşlem yapmak istediğiniz kayda tıklayın, ardından butona tıklayın.</string>
+             </property>
              <property name="text">
               <string>Pozisyonu Seç</string>
              </property>
@@ -243,6 +249,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="toolTip">
+              <string>Tablodan önce kaydı seçin, ardından bilgileri doldurun ve butona tıklayın.</string>
+             </property>
              <property name="text">
               <string>Pozisyonu Kapat</string>
              </property>
@@ -255,6 +264,9 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Veri havuzundan silmek istediğiniz kaydı tablodan seçin ve butona tıklayın</string>
              </property>
              <property name="text">
               <string>Pozisyonu Sil</string>

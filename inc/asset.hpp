@@ -72,6 +72,7 @@ public:
     std::string getSymbol() const { return m_symbol; }
     std::string getSymbolName() const { return m_symbolName; }
     QString getBuyDate() const { return m_buyDate.toString("dd-MM-yyyy"); }
+    QDate getBuyQDate() const { return m_buyDate; }
     double getBuyPrice() const { return m_buyPrice; }
     int getQuantity() const { return m_quantity; }
     QString getSellDate() const { return m_sellDate.isValid() ? m_sellDate.toString("dd-MM-yyyy") : ""; }

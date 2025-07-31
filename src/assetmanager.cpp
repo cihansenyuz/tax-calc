@@ -41,14 +41,14 @@ void AssetManager::processOpenTransaction() {
 
     m_asset_to_be_updated.setExchangeRateAtBuy(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtBuy(m_data_to_be_updated.second);
-    
-    m_assets.push_back(m_asset_to_be_updated);
-    
+
     if(!m_asset_db->saveAsset(m_asset_to_be_updated))
         throw std::runtime_error("Failed to save asset to database");
 
+    m_assets.push_back(m_asset_to_be_updated);
+
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
-    
+
     emit databaseReady();
 }
 
@@ -68,8 +68,11 @@ void AssetManager::processCloseTransaction(){
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
-    
+
     m_asset_to_be_updated.setTaxBase(Calculator::calculateTaxBase(m_asset_to_be_updated));
+
+    if(!m_asset_db->updateAsset(m_asset_to_be_updated))
+        throw std::runtime_error("Failed to update asset in database");
 
     for(auto& asset : m_assets){
         if (asset.getId() == m_asset_to_be_updated.getId()) {
@@ -78,11 +81,8 @@ void AssetManager::processCloseTransaction(){
         }
     }
 
-    if(!m_asset_db->updateAsset(m_asset_to_be_updated))
-        throw std::runtime_error("Failed to update asset in database");
-
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
-    
+
     emit databaseReady();
 }
 
@@ -149,20 +149,16 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, c
         }
     }
     
-    // Only proceed if both exchange rate and inflation index have been received
     if (m_exchangeRateReceived && m_inflationIndexReceived) {
         qDebug() << "Both values received, processing transaction";
         
-        // Keep the lock held during the entire processing to ensure atomicity
         TransactionType currentType = m_currentTransactionType;
         
-        // Reset transaction state before processing (still under lock)
         m_currentTransactionType = TransactionType::None;
         m_exchangeRateReceived = false;
         m_inflationIndexReceived = false;
         lock.unlock();
         
-        // Process the transaction based on the captured type
         switch (currentType) {
             case TransactionType::Open:
                 processOpenTransaction();
@@ -176,8 +172,6 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, c
                 break;
         }
     }
-    
-    // Lock is automatically released when going out of scope
 }
 
 Asset AssetManager::findAssetById(int id){

@@ -29,6 +29,7 @@ public:
     void closeTransaction(const Asset& asset);
     void updateAsset(Asset& asset);
     Asset findAssetById(int id);
+    void removeAsset(int id);
     const std::vector<Asset>& getAssets() const { return m_assets; }
     void clear() { m_assets.clear(); }
     size_t size() const { return m_assets.size(); }

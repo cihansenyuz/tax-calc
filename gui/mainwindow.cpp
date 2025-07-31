@@ -57,26 +57,27 @@ void MainWindow::onCreateButtonClicked()
     }
 }
 
-    void MainWindow::onDeletePositionButtonClicked()
-    {
-        if(ui->IDlabel->text().isEmpty()) {
-            QMessageBox::warning(this, "Delete Position", "No position selected to delete.");
-            return;
-        }
-
-        int id = ui->IDlabel->text().toInt();
-        connect(m_asset_manager, &AssetManager::databaseReady,
-                this, [this](){ 
-                    qDebug() << "Database is ready, refreshing table.";
-                    m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
-                    
-        try{
-            m_asset_manager->removeAsset(id);
-        } catch (const std::runtime_error& e) {
-            QMessageBox::warning(this, "Delete Position", e.what());
-            return;
-        }
+void MainWindow::onDeletePositionButtonClicked()
+{
+    if(ui->IDlabel->text().isEmpty()) {
+        QMessageBox::warning(this, "Delete Position", "No position selected to delete.");
+        return;
     }
+
+    int id = ui->IDlabel->text().toInt();
+    connect(m_asset_manager, &AssetManager::databaseReady,
+            this, [this](){ 
+                qDebug() << "Database is ready, refreshing table.";
+                m_table.refresh(m_asset_manager->getAssets()); }, Qt::SingleShotConnection);
+                
+    try{
+        m_asset_manager->removeAsset(id);
+    } catch (const std::runtime_error& e) {
+        QMessageBox::warning(this, "Delete Position", e.what());
+        return;
+    }
+    QMessageBox::information(this, "Delete Position", "Position deleted successfully.");
+}
 
 void MainWindow::onCloseTransactionButtonClicked(){
     if (ui->IDlabel->text().isEmpty()) {

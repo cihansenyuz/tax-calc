@@ -64,6 +64,18 @@ void AssetManager::closeTransaction(const Asset& asset){
     m_evds_fetcher->fetchInflationIndex(asset.getSellQDate());
 }
 
+void AssetManager::potentialTransaction(const Asset& asset){
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_asset_to_be_updated = asset;
+    m_currentTransactionType = TransactionType::Potential;
+    m_exchangeRateReceived = false;
+    m_inflationIndexReceived = false;
+    m_data_to_be_updated = {0.0, 0.0}; // Reset data
+
+    m_evds_fetcher->fetchExchangeRate(asset.getSellQDate());
+    m_evds_fetcher->fetchInflationIndex(asset.getSellQDate());
+}
+
 void AssetManager::processCloseTransaction(){
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
@@ -84,6 +96,15 @@ void AssetManager::processCloseTransaction(){
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
 
     emit databaseReady();
+}
+
+void AssetManager::processPotentialTransaction(){
+    // This function will be defined later
+    std::unique_lock<std::mutex> lock(m_mutex);
+    // TODO: Implement potential transaction processing logic
+    qDebug() << "Processing potential transaction for asset ID:" << m_asset_to_be_updated.getId();
+    qDebug() << "Succeeded!";
+    m_data_to_be_updated = {0.0, 0.0}; // Reset after use
 }
 
 void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, const QString &seriesCode) {
@@ -165,6 +186,9 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, c
                 break;
             case TransactionType::Close:
                 processCloseTransaction();
+                break;
+            case TransactionType::Potential:
+                processPotentialTransaction();
                 break;
             case TransactionType::None:
                 // This shouldn't happen due to early return above

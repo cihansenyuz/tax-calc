@@ -13,7 +13,8 @@ public:
     enum class TransactionType {
         None,
         Open,
-        Close
+        Close,
+        Potential
     };
 
     enum class DataType {
@@ -27,6 +28,7 @@ public:
 
     void openTransaction(const Asset& asset);
     void closeTransaction(const Asset& asset);
+    void potentialTransaction(const Asset& asset);
     void updateAsset(Asset& asset);
     Asset findAssetById(int id);
     void removeAsset(int id);
@@ -56,4 +58,5 @@ private:
 
     void processOpenTransaction();
     void processCloseTransaction();
+    void processPotentialTransaction();
 };

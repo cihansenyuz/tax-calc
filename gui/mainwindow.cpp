@@ -117,7 +117,7 @@ void MainWindow::onPotentialCalculateButtonClicked(){
     }
 
     Asset selectedAsset = m_asset_manager->findAssetById(ui->IDlabel->text().toInt());
-    double potentialSellPrice = ui->potantialSellPriceSpinBox->value();
+    double potentialSellPrice = ui->potentialSellPriceSpinBox->value();
     QDate currentDate = QDate::currentDate();
 
     if (potentialSellPrice <= 0) {

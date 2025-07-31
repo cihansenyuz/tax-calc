@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCloseTransactionButtonClicked);
     connect(ui->deletePositionButton, &QPushButton::clicked,
             this, &MainWindow::onDeletePositionButtonClicked);
-    connect(ui->pushButton, &QPushButton::clicked,
+    connect(ui->calculatePotentialTaxButton, &QPushButton::clicked,
             this, &MainWindow::onPotentialCalculateButtonClicked);
     connect(m_asset_manager, &AssetManager::databaseReady,
             this, &MainWindow::onDatabaseReady);
@@ -128,5 +128,9 @@ void MainWindow::onPotentialCalculateButtonClicked(){
     selectedAsset.setSellDate(currentDate);
     selectedAsset.setSellPrice(potentialSellPrice);
 
+    connect(m_asset_manager, &AssetManager::potentialTaxBaseReady,
+            this, [this](double potentialTaxBase) {
+                ui->potantialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2));
+            }, Qt::SingleShotConnection);
     m_asset_manager->potentialTransaction(selectedAsset);
 }

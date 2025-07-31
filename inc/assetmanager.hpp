@@ -16,6 +16,12 @@ public:
         Close
     };
 
+    enum class DataType {
+        None,
+        ExchangeRate,
+        InflationIndex
+    };
+
     explicit AssetManager(QObject *parent = nullptr);
     ~AssetManager();
 
@@ -32,7 +38,8 @@ signals:
     void databaseReady();
 
 private slots:
-    void onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data);
+    void onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
+                            const QString &seriesCode);
 
 private:
     std::vector<Asset> m_assets;
@@ -40,6 +47,8 @@ private:
     std::pair<double, double> m_data_to_be_updated{0.0, 0.0}; // (USD, TUFE)
     std::mutex m_mutex;
     TransactionType m_currentTransactionType;
+    bool m_exchangeRateReceived{false};
+    bool m_inflationIndexReceived{false};
     class HttpManager *m_http_manager;
     class EvdsFetcher *m_evds_fetcher;
     class AssetDatabase *m_asset_db;

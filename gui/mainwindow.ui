@@ -79,6 +79,14 @@
          </item>
          <item>
           <widget class="QLabel" name="IDlabel">
+           <property name="font">
+            <font>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: red;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -103,6 +111,9 @@
          </item>
          <item>
           <widget class="QLabel" name="symbolLabel">
+           <property name="styleSheet">
+            <string notr="true">color: red;</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -127,6 +138,9 @@
          </item>
          <item>
           <widget class="QLabel" name="quantityLabel">
+           <property name="styleSheet">
+            <string notr="true">color: red;</string>
+           </property>
            <property name="text">
             <string/>
            </property>

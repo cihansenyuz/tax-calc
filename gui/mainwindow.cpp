@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onDeletePositionButtonClicked);
     connect(m_asset_manager, &AssetManager::databaseReady,
             this, &MainWindow::onDatabaseReady);
+    connect(ui->cleanSelectionButton, &QPushButton::clicked,
+            this, &MainWindow::onCleanSelectionButtonClicked);
 
     connect(ui->selectButton, &QPushButton::clicked, this, [this]() {
         int selectedRow = m_table.currentRow();
@@ -33,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->IDlabel->setText(QString::number(selectedAsset.getId()));
     });
     
-    qobject_cast<QVBoxLayout*>(ui->centralwidget->layout())->insertWidget(0, &m_table);
+    qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(m_asset_manager->getAssets());
 }
 
@@ -47,6 +49,13 @@ void MainWindow::onDatabaseReady()
 {
     qDebug() << "Database is ready, refreshing table.";
     m_table.refresh(m_asset_manager->getAssets());
+}
+
+void MainWindow::onCleanSelectionButtonClicked()
+{
+    ui->symbolLabel->clear();
+    ui->quantityLabel->clear();
+    ui->IDlabel->clear();
 }
 
 void MainWindow::onCreateButtonClicked()

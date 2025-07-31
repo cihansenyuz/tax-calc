@@ -24,6 +24,7 @@ private slots:
     void onCloseTransactionButtonClicked();
     void onDeletePositionButtonClicked();
     void onDatabaseReady();
+    void onCleanSelectionButtonClicked();
 
 private:
     Ui::MainWindow *ui;

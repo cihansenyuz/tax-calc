@@ -5,19 +5,23 @@
 #include "httpmanager.h"
 #include <QObject>
 #include <QString>
+#include <QDate>
 #include <memory>
 
 class EvdsFetcher : public QObject {
     Q_OBJECT
 public:
     explicit EvdsFetcher(HttpManager *manager, QObject *parent = nullptr);
-    void fetch(const QString &series, const QString &startDate, const QString &endDate);
+    void fetchExchangeRate(QDate date);
+    void fetchInflationIndex(QDate date);
 
-    static constexpr const char* SERIES = "TP.DK.USD.A-TP.TUFE1YI.T1";
+    static constexpr const char* SERIES_USD = "TP.DK.USD.A";
+    static constexpr const char* SERIES_INFLATION = "TP.TUFE1YI.T1";
     static constexpr const char* API_KEY = "HSzat3MFdF";
 
 signals:
-    void evdsDataFetched(const std::shared_ptr<QJsonObject> &data);
+    void evdsDataFetched(const std::shared_ptr<QJsonObject> &data,
+                        const QString &seriesCode);
     void fetchFailed(const QString &error);
 
 private slots:

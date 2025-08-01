@@ -1,5 +1,4 @@
-#ifndef CREATEDIALOG_HPP
-#define CREATEDIALOG_HPP
+#pragma once
 
 #include <QDialog>
 #include "../inc/asset.hpp"
@@ -30,5 +29,3 @@ private slots:
 private:
     Ui::Dialog *ui;
 };
-
-#endif // CREATEDIALOG_HPP

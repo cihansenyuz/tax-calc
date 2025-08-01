@@ -1,5 +1,4 @@
-#ifndef HTTPMANAGER_H
-#define HTTPMANAGER_H
+#pragma once
 
 #include "getrequest.hpp"
 
@@ -18,5 +17,3 @@ public:
     QString token{TOKEN};
     QString key;
 };
-
-#endif // HTTPMANAGER_H

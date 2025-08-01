@@ -1,5 +1,4 @@
-#ifndef GETREQUEST_H
-#define GETREQUEST_H
+#pragma once
 
 #include "networkcore.hpp"
 
@@ -20,5 +19,3 @@ private:
     QNetworkReply* getHttpReply(const QNetworkRequest &request) override;
     HttpManager *parent_;
 };
-
-#endif // GETREQUEST_H

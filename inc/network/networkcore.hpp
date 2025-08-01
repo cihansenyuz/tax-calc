@@ -1,5 +1,4 @@
-#ifndef NETWORKCORE_H
-#define NETWORKCORE_H
+#pragma once
 
 #include <QObject>
 #include <QtNetwork>
@@ -51,5 +50,3 @@ public:
     QNetworkAccessManager http_access_manager;
     QJsonDocument http_body_data;
 };
-
-#endif // NETWORKCORE_H

@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#pragma once
 
 #include <QMainWindow>
 
@@ -36,5 +35,3 @@ private:
 
     void calculateTotalTaxBase(double potential = 0.0);
 };
-
-#endif // MAINWINDOW_HPP

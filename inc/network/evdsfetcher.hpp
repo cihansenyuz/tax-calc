@@ -1,5 +1,4 @@
-#ifndef EVDSFETCHER_H
-#define EVDSFETCHER_H
+#pragma once
 
 #include "getrequest.hpp"
 #include "httpmanager.hpp"
@@ -31,5 +30,3 @@ private:
     HttpManager *http_manager_;
     GetRequest *getRequest_;
 };
-
-#endif // EVDSFETCHER_H

@@ -8,16 +8,16 @@ class GetRequest : public NetworkCore
     Q_OBJECT
 public:
     GetRequest(HttpManager *parent = nullptr);
-    void FetchJsonData(const QString &api_query);
+    void fetchJsonData(const QString &api_query);
 
 signals:
-    void JsonFetched(const std::shared_ptr<QJsonObject> &fetched_data);
+    void jsonFetched(const std::shared_ptr<QJsonObject> &fetched_data);
 
 private slots:
-    void OnFetchJsonDataReplyRecieved(QNetworkReply* reply);
+    void onFetchJsonDataReplyReceived(QNetworkReply* reply);
 
 private:
-    QNetworkReply* GetHttpReply(const QNetworkRequest &request) override;
+    QNetworkReply* getHttpReply(const QNetworkRequest &request) override;
     HttpManager *parent_;
 };
 

@@ -13,9 +13,9 @@ class NetworkCore : public QObject
     Q_OBJECT
 public:
     NetworkCore() = default;
-    virtual QNetworkReply* GetHttpReply(const QNetworkRequest &request) = 0;
+    virtual QNetworkReply* getHttpReply(const QNetworkRequest &request) = 0;
     template<typename T>
-    void SendHttpRequest(const QString &api_query,
+    void sendHttpRequest(const QString &api_query,
                          const QString &key,
                          T* requester_object,
                          void (T::*slot_function)(QNetworkReply*)){
@@ -33,7 +33,7 @@ public:
         }
         qDebug() << "#########################################";
 
-        QNetworkReply* reply = GetHttpReply(http_request);
+        QNetworkReply* reply = getHttpReply(http_request);
         
         // Use lambda to capture the reply and pass it to the slot
         connect(reply, &QNetworkReply::finished, [requester_object, slot_function, reply]() {
@@ -45,8 +45,8 @@ public:
                 reply, &QNetworkReply::deleteLater,
                 Qt::SingleShotConnection);
     }
-    QJsonObject ReadBody(QNetworkReply* reply);
-    int GetHttpStatusCode(QNetworkReply* reply);
+    QJsonObject readBody(QNetworkReply* reply);
+    int getHttpStatusCode(QNetworkReply* reply);
 
     QNetworkAccessManager http_access_manager;
     QJsonDocument http_body_data;

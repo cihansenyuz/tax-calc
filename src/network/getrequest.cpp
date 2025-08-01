@@ -4,7 +4,7 @@
 GetRequest::GetRequest(HttpManager *parent)
     : parent_(parent) {}
 
-void GetRequest::OnFetchJsonDataReplyRecieved(QNetworkReply* reply){
+void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply){
     qDebug() << "#### on fetch(get) reply ####";
     
     if (!reply) {
@@ -21,7 +21,7 @@ void GetRequest::OnFetchJsonDataReplyRecieved(QNetworkReply* reply){
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         if(statusCode == 200){
             fetched_data = std::make_shared<QJsonObject>(replyDocument.object());
-            emit JsonFetched(fetched_data);
+            emit jsonFetched(fetched_data);
             qDebug() << "json data fetched successfully";
         }
         else if(statusCode == 401 || statusCode == 403)
@@ -36,11 +36,11 @@ void GetRequest::OnFetchJsonDataReplyRecieved(QNetworkReply* reply){
     qDebug() << "#########################################\n";
 }
 
-void GetRequest::FetchJsonData(const QString &api_query){
-    SendHttpRequest(api_query, parent_->key, this, &GetRequest::OnFetchJsonDataReplyRecieved);
+void GetRequest::fetchJsonData(const QString &api_query){
+    sendHttpRequest(api_query, parent_->key, this, &GetRequest::onFetchJsonDataReplyReceived);
 }
 
-QNetworkReply* GetRequest::GetHttpReply(const QNetworkRequest &request){
+QNetworkReply* GetRequest::getHttpReply(const QNetworkRequest &request){
     qDebug() << "get request done";
     return http_access_manager.get(request, http_body_data.toJson());
 }

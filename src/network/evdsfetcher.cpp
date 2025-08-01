@@ -4,7 +4,7 @@
 EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)
     : QObject(parent), http_manager_(http_manager)
 {
-    connect(http_manager_, &HttpManager::JsonFetched, this, &EvdsFetcher::onJsonFetched);
+    connect(http_manager_, &HttpManager::jsonFetched, this, &EvdsFetcher::onJsonFetched);
 }
 
 void EvdsFetcher::fetchExchangeRate(QDate date)
@@ -13,7 +13,7 @@ void EvdsFetcher::fetchExchangeRate(QDate date)
     QString endDate = date.toString("dd-MM-yyyy");
     QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
                         .arg(SERIES_USD, startDate, endDate);
-    http_manager_->FetchJsonData(query);
+    http_manager_->fetchJsonData(query);
 }
 
 void EvdsFetcher::fetchInflationIndex(QDate date)
@@ -22,7 +22,7 @@ void EvdsFetcher::fetchInflationIndex(QDate date)
     QString endDate = startDate;
     QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
                         .arg(SERIES_INFLATION, startDate, endDate);
-    http_manager_->FetchJsonData(query);
+    http_manager_->fetchJsonData(query);
 }
 
 void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data)

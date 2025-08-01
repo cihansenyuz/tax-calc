@@ -40,11 +40,13 @@ public:
 signals:
     void databaseReady();
     void potentialTaxBaseReady(double potentialTaxBase);
+    void fetchFailed(const QString &error);
 
 private slots:
     void onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
                             const QString &seriesCode);
-
+    void onfetchFailed(const QString &error);
+    
 private:
     std::vector<Asset> m_assets;
     Asset m_asset_to_be_updated;

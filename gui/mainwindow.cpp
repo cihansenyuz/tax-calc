@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onDatabaseReady);
     connect(ui->cleanSelectionButton, &QPushButton::clicked,
             this, &MainWindow::onCleanSelectionButtonClicked);
+    connect(m_asset_manager, &AssetManager::fetchFailed,
+            this, &MainWindow::onFetchFailed);
 
     connect(ui->selectButton, &QPushButton::clicked, this, [this]() {
         int selectedRow = m_table.currentRow();
@@ -134,4 +136,8 @@ void MainWindow::onPotentialCalculateButtonClicked(){
                 ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2));
             }, Qt::SingleShotConnection);
     m_asset_manager->potentialTransaction(selectedAsset);
+}
+
+void MainWindow::onFetchFailed(const QString &error) {
+    QMessageBox::warning(this, "İşlem Başarısız", error);
 }

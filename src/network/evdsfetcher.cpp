@@ -29,16 +29,23 @@ void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data)
 {
     if (data) {
         QString seriesCode;
-        
+
         if (data->contains("items")) {
             QJsonArray items = data->value("items").toArray();
             qDebug() << "EvdsFetcher: Processing" << items.size() << "items";
-            
+
+            // Special condition: totalCount == 0 and items is empty
+            // Occurs when last month's inflation index has not been published yet
+            if (data->value("totalCount").toInt() == 0 && items.isEmpty()) {
+                emit fetchFailed("Henüz yayımlanmayan veri var.\nLütfen bir kaç gün sonra tekrar deneyin.");
+                return;
+            }
+
             // Check all items to determine the series type
             for (int i = 0; i < items.size(); ++i) {
                 QJsonObject item = items.at(i).toObject();
                 qDebug() << "EvdsFetcher: Item" << i << "keys:" << item.keys();
-                
+
                 // Check for USD series field
                 if (item.contains("TP_DK_USD_A")) {
                     seriesCode = SERIES_USD;
@@ -53,10 +60,10 @@ void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data)
                 }
             }
         }
-        
+
         qDebug() << "EvdsFetcher: Emitting series code:" << seriesCode;
         emit evdsDataFetched(data, seriesCode);
     } else {
-        emit fetchFailed("Failed to fetch EVDS data");
+        emit fetchFailed("TCMB sunucusundan veri alınamadı.");
     }
 }

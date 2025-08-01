@@ -26,6 +26,7 @@ private slots:
     void onPotentialCalculateButtonClicked();
     void onDatabaseReady();
     void onCleanSelectionButtonClicked();
+    void onFetchFailed(const QString &error);
 
 private:
     Ui::MainWindow *ui;

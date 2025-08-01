@@ -11,6 +11,7 @@ AssetManager::AssetManager(QObject *parent)
     m_http_manager->setKey(EvdsFetcher::API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
+    connect(m_evds_fetcher, &EvdsFetcher::fetchFailed, this, &AssetManager::onfetchFailed);
     
     m_asset_db = & AssetDatabase::getInstance("assets.db");
     if(!m_asset_db->initAssetTable())
@@ -225,4 +226,13 @@ void AssetManager::removeAsset(int id)
     else {
         throw std::runtime_error{"Failed to delete asset with ID " + std::to_string(id) + " from database."};
     }
+}
+
+void AssetManager::onfetchFailed(const QString &error) {
+    m_currentTransactionType = TransactionType::None;
+    m_exchangeRateReceived = false;
+    m_inflationIndexReceived = false;
+    m_data_to_be_updated = {0.0, 0.0};
+    
+    emit fetchFailed(error);
 }

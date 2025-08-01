@@ -5,8 +5,7 @@
 #include <QDebug>
 
 AssetManager::AssetManager(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
     m_http_manager = new HttpManager();
     m_http_manager->setKey(EvdsFetcher::API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
@@ -53,7 +52,7 @@ void AssetManager::processOpenTransaction() {
     emit databaseReady();
 }
 
-void AssetManager::closeTransaction(const Asset& asset){
+void AssetManager::closeTransaction(const Asset& asset) {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated = asset;
     m_currentTransactionType = TransactionType::Close;
@@ -65,7 +64,7 @@ void AssetManager::closeTransaction(const Asset& asset){
     m_evds_fetcher->fetchInflationIndex(asset.getSellQDate());
 }
 
-void AssetManager::potentialTransaction(const Asset& asset){
+void AssetManager::potentialTransaction(const Asset& asset) {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated = asset;
     m_currentTransactionType = TransactionType::Potential;
@@ -77,7 +76,7 @@ void AssetManager::potentialTransaction(const Asset& asset){
     m_evds_fetcher->fetchInflationIndex(asset.getSellQDate());
 }
 
-void AssetManager::processCloseTransaction(){
+void AssetManager::processCloseTransaction() {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
@@ -99,7 +98,7 @@ void AssetManager::processCloseTransaction(){
     emit databaseReady();
 }
 
-void AssetManager::processPotentialTransaction(){
+void AssetManager::processPotentialTransaction() {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
     m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
@@ -109,13 +108,15 @@ void AssetManager::processPotentialTransaction(){
     emit potentialTaxBaseReady(potentialTaxBase);
 }
 
-void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, const QString &seriesCode) {
+void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
+                                    const QString &seriesCode) {
     qDebug() << "EVDS data fetched for series:" << seriesCode;
     
     // Thread-safe file writing with unique filename
     static std::atomic<int> fileCounter{0};
     QString filename = QString("fetched_data_%1_%2.json").arg(seriesCode).arg(fileCounter.fetch_add(1));
     QFile file(filename);
+
     if (file.open(QIODevice::WriteOnly)) {
         QJsonDocument doc(*data);
         file.write(doc.toJson());
@@ -200,7 +201,7 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data, c
     }
 }
 
-Asset AssetManager::findAssetById(int id){
+Asset AssetManager::findAssetById(int id) {
     std::unique_lock<std::mutex> lock(m_mutex);
     for (const auto& asset : m_assets) {
         if (asset.getId() == id) {
@@ -210,8 +211,7 @@ Asset AssetManager::findAssetById(int id){
     throw std::runtime_error{"Asset with ID " + std::to_string(id) + " not found."};
 }
 
-void AssetManager::removeAsset(int id)
-{
+void AssetManager::removeAsset(int id) {
     if(m_asset_db->deleteAsset(id)) {
         std::unique_lock<std::mutex> lock(m_mutex);
         auto it = std::remove_if(m_assets.begin(), m_assets.end(),

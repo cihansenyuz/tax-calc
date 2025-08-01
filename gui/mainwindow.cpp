@@ -3,8 +3,7 @@
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow)
-{
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     m_asset_manager = new AssetManager(this);
     connect(ui->createButton, &QPushButton::clicked,
@@ -45,28 +44,24 @@ MainWindow::MainWindow(QWidget *parent)
     calculateTotalTaxBase();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete m_asset_manager;
     delete ui;
 }
 
-void MainWindow::onDatabaseReady()
-{
+void MainWindow::onDatabaseReady() {
     qDebug() << "Database is ready, refreshing table.";
     m_table.refresh(m_asset_manager->getAssets());
     calculateTotalTaxBase();
 }
 
-void MainWindow::onCleanSelectionButtonClicked()
-{
+void MainWindow::onCleanSelectionButtonClicked() {
     ui->symbolLabel->clear();
     ui->quantityLabel->clear();
     ui->IDlabel->clear();
 }
 
-void MainWindow::onCreateButtonClicked()
-{
+void MainWindow::onCreateButtonClicked() {
     if (!m_create_dialog) {
         m_create_dialog = std::make_unique<CreateDialog>(this);
         connect(m_create_dialog.get(), &CreateDialog::assetCreated,
@@ -77,8 +72,7 @@ void MainWindow::onCreateButtonClicked()
     }
 }
 
-void MainWindow::onDeletePositionButtonClicked()
-{
+void MainWindow::onDeletePositionButtonClicked() {
     if(ui->IDlabel->text().isEmpty()) {
         QMessageBox::warning(this, "Pozisyon Sil", "Silinecek pozisyon seçilmedi.");
         return;
@@ -95,7 +89,7 @@ void MainWindow::onDeletePositionButtonClicked()
     QMessageBox::information(this, "Pozisyon Sil", "Pozisyon başarıyla silindi.");
 }
 
-void MainWindow::onCloseTransactionButtonClicked(){
+void MainWindow::onCloseTransactionButtonClicked() {
     if (ui->IDlabel->text().isEmpty()) {
         return; // No selection
     }
@@ -116,7 +110,7 @@ void MainWindow::onCloseTransactionButtonClicked(){
     m_asset_manager->closeTransaction(selectedAsset);
 }
 
-void MainWindow::onPotentialCalculateButtonClicked(){
+void MainWindow::onPotentialCalculateButtonClicked() {
     if (ui->IDlabel->text().isEmpty()) {
         QMessageBox::warning(this, "Seçim Hatası", "Potansiyel vergi hesaplamak için lütfen bir pozisyon seçin.");
         return;
@@ -147,7 +141,6 @@ void MainWindow::onFetchFailed(const QString &error) {
 }
 
 void MainWindow::calculateTotalTaxBase(double potential) {
-
     double totalTaxBase = 0.0;
     
     for(const auto &asset : m_asset_manager->getAssets()) {

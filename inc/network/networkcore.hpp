@@ -7,8 +7,7 @@
 
 class HttpManager;
 
-class NetworkCore : public QObject
-{
+class NetworkCore : public QObject {
     Q_OBJECT
 public:
     NetworkCore() = default;

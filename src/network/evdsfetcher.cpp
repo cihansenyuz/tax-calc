@@ -2,13 +2,11 @@
 #include <QDebug>
 
 EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)
-    : QObject(parent), http_manager_(http_manager)
-{
+    : QObject(parent), http_manager_(http_manager) {
     connect(http_manager_, &HttpManager::jsonFetched, this, &EvdsFetcher::onJsonFetched);
 }
 
-void EvdsFetcher::fetchExchangeRate(QDate date)
-{
+void EvdsFetcher::fetchExchangeRate(QDate date) {
     QString startDate = date.addDays(-3).toString("dd-MM-yyyy");
     QString endDate = date.toString("dd-MM-yyyy");
     QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
@@ -16,8 +14,7 @@ void EvdsFetcher::fetchExchangeRate(QDate date)
     http_manager_->fetchJsonData(query);
 }
 
-void EvdsFetcher::fetchInflationIndex(QDate date)
-{
+void EvdsFetcher::fetchInflationIndex(QDate date) {
     QString startDate = date.addMonths(-1).toString("dd-MM-yyyy");
     QString endDate = startDate;
     QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
@@ -25,8 +22,7 @@ void EvdsFetcher::fetchInflationIndex(QDate date)
     http_manager_->fetchJsonData(query);
 }
 
-void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data)
-{
+void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {
     if (data) {
         QString seriesCode;
 
@@ -63,7 +59,8 @@ void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data)
 
         qDebug() << "EvdsFetcher: Emitting series code:" << seriesCode;
         emit evdsDataFetched(data, seriesCode);
-    } else {
+    }
+    else {
         emit fetchFailed("TCMB sunucusundan veri alınamadı.");
     }
 }

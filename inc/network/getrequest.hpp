@@ -2,8 +2,7 @@
 
 #include "networkcore.hpp"
 
-class GetRequest : public NetworkCore
-{
+class GetRequest : public NetworkCore {
     Q_OBJECT
 public:
     GetRequest(HttpManager *parent = nullptr);

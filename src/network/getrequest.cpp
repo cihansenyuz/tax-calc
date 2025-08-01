@@ -4,7 +4,7 @@
 GetRequest::GetRequest(HttpManager *parent)
     : parent_(parent) {}
 
-void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply){
+void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
     qDebug() << "#### on fetch(get) reply ####";
     
     if (!reply) {
@@ -36,11 +36,11 @@ void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply){
     qDebug() << "#########################################\n";
 }
 
-void GetRequest::fetchJsonData(const QString &api_query){
+void GetRequest::fetchJsonData(const QString &api_query) {
     sendHttpRequest(api_query, parent_->key, this, &GetRequest::onFetchJsonDataReplyReceived);
 }
 
-QNetworkReply* GetRequest::getHttpReply(const QNetworkRequest &request){
+QNetworkReply* GetRequest::getHttpReply(const QNetworkRequest &request) {
     qDebug() << "get request done";
     return http_access_manager.get(request, http_body_data.toJson());
 }

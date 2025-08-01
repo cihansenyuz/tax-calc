@@ -112,15 +112,16 @@ bool AssetDatabase::updateAsset(const Asset& asset) {
     return true;
 }
 
-bool AssetDatabase::deleteAsset(int id)
-{
+bool AssetDatabase::deleteAsset(int id) {
     QSqlQuery query(m_db);
     query.prepare("DELETE FROM assets WHERE id=?");
     query.addBindValue(id);
+
     if (!query.exec()) {
         qWarning() << "Failed to delete asset:" << query.lastError().text();
         return false;
     }
+
     return true;
 }
 
@@ -134,6 +135,7 @@ std::vector<Asset> AssetDatabase::loadAssets()
         qWarning() << "Failed to load assets:" << query.lastError().text();
         return assets;
     }
+
     while (query.next()) {
         Asset asset(
             query.value(0).toInt(), // id
@@ -175,6 +177,7 @@ std::vector<Asset> AssetDatabase::loadAssets()
         assets.push_back(asset);
     }
     qDebug() << "Successfully loaded" << assets.size() << "assets from database.";
+    
     return assets;
 }
 

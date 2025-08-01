@@ -6,7 +6,7 @@
     #define TOKEN ""
 #endif
 
-class HttpManager : public GetRequest{
+class HttpManager : public GetRequest {
 public:
     HttpManager() : GetRequest(this) {}
 

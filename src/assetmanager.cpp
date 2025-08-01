@@ -11,7 +11,7 @@ AssetManager::AssetManager(QObject *parent)
     m_http_manager->setKey(EvdsFetcher::API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
-    connect(m_evds_fetcher, &EvdsFetcher::fetchFailed, this, &AssetManager::onfetchFailed);
+    connect(m_evds_fetcher, &EvdsFetcher::fetchFailed, this, &AssetManager::onFetchFailed);
     
     m_asset_db = & AssetDatabase::getInstance("assets.db");
     if(!m_asset_db->initAssetTable())
@@ -228,7 +228,7 @@ void AssetManager::removeAsset(int id)
     }
 }
 
-void AssetManager::onfetchFailed(const QString &error) {
+void AssetManager::onFetchFailed(const QString &error) {
     m_currentTransactionType = TransactionType::None;
     m_exchangeRateReceived = false;
     m_inflationIndexReceived = false;

@@ -45,7 +45,7 @@ signals:
 private slots:
     void onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
                             const QString &seriesCode);
-    void onfetchFailed(const QString &error);
+    void onFetchFailed(const QString &error);
     
 private:
     std::vector<Asset> m_assets;

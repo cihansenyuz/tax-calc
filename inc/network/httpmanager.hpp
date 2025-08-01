@@ -1,7 +1,7 @@
 #ifndef HTTPMANAGER_H
 #define HTTPMANAGER_H
 
-#include "getrequest.h"
+#include "getrequest.hpp"
 
 #ifndef TOKEN
     #define TOKEN ""

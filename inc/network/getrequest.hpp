@@ -1,7 +1,7 @@
 #ifndef GETREQUEST_H
 #define GETREQUEST_H
 
-#include "networkcore.h"
+#include "networkcore.hpp"
 
 class GetRequest : public NetworkCore
 {

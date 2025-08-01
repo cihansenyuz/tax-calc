@@ -1,8 +1,8 @@
 #ifndef EVDSFETCHER_H
 #define EVDSFETCHER_H
 
-#include "getrequest.h"
-#include "httpmanager.h"
+#include "getrequest.hpp"
+#include "httpmanager.hpp"
 #include <QObject>
 #include <QString>
 #include <QDate>

@@ -1,4 +1,4 @@
-#include "../../inc/network/evdsfetcher.h"
+#include "../../inc/network/evdsfetcher.hpp"
 #include <QDebug>
 
 EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)

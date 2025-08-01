@@ -19,10 +19,10 @@ set(PROJECT_SOURCES
         src/database/assetdatabase.cpp
         src/assetmanager.cpp
 
-        inc/network/networkcore.h
-        inc/network/getrequest.h
-        inc/network/httpmanager.h
-        inc/network/evdsfetcher.h
+        inc/network/networkcore.hpp
+        inc/network/getrequest.hpp
+        inc/network/httpmanager.hpp
+        inc/network/evdsfetcher.hpp
         inc/database/assetdatabase.hpp
         inc/assetmanager.hpp
         inc/calculator.hpp

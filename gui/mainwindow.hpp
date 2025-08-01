@@ -4,8 +4,8 @@
 #include <QMainWindow>
 
 #include "../inc/assetmanager.hpp"
-#include "../inc/network/evdsfetcher.h"
-#include "../inc/network/httpmanager.h"
+#include "../inc/network/evdsfetcher.hpp"
+#include "../inc/network/httpmanager.hpp"
 #include "transactiontable.hpp"
 #include "createdialog.hpp"
 

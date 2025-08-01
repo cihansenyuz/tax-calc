@@ -1,5 +1,5 @@
-#include "../../inc/network/getrequest.h"
-#include "../../inc/network/httpmanager.h"
+#include "../../inc/network/getrequest.hpp"
+#include "../../inc/network/httpmanager.hpp"
 
 GetRequest::GetRequest(HttpManager *parent)
     : parent_(parent) {}

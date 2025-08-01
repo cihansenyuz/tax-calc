@@ -1,4 +1,4 @@
-#include "../../inc/network/networkcore.h"
+#include "../../inc/network/networkcore.hpp"
 
 QJsonObject NetworkCore::ReadBody(QNetworkReply* reply){
     QByteArray raw_data = reply->readAll();

@@ -156,23 +156,23 @@ std::vector<Transaction> TransactionDatabase::loadAssets()
         );
         
         // Print each property of the loaded asset
-        qDebug() << "=== Loaded Asset Properties ===";
-        qDebug() << "ID:" << asset.getId();
-        qDebug() << "Symbol:" << QString::fromStdString(asset.getSymbol());
-        qDebug() << "Symbol Name:" << QString::fromStdString(asset.getSymbolName());
-        qDebug() << "Buy Date:" << asset.getBuyDate();
-        qDebug() << "Buy Price:" << asset.getBuyPrice();
-        qDebug() << "Quantity:" << asset.getQuantity();
-        qDebug() << "Sell Date:" << asset.getSellDate();
-        qDebug() << "Sell Price:" << asset.getSellPrice();
-        qDebug() << "Status:" << Transaction::statusToString(asset.getStatus());
-        qDebug() << "Inflation Index At Buy:" << asset.getInflationIndexAtBuy();
-        qDebug() << "Exchange Rate At Buy:" << asset.getExchangeRateAtBuy();
-        qDebug() << "Inflation Index At Sell:" << asset.getInflationIndexAtSell();
-        qDebug() << "Exchange Rate At Sell:" << asset.getExchangeRateAtSell();
-        qDebug() << "Tax Base:" << asset.getTaxBase();
-        qDebug() << "Tax:" << asset.getTax();
-        qDebug() << "===============================";
+        // qDebug() << "=== Loaded Asset Properties ===";
+        // qDebug() << "ID:" << asset.getId();
+        // qDebug() << "Symbol:" << QString::fromStdString(asset.getSymbol());
+        // qDebug() << "Symbol Name:" << QString::fromStdString(asset.getSymbolName());
+        // qDebug() << "Buy Date:" << asset.getBuyDate();
+        // qDebug() << "Buy Price:" << asset.getBuyPrice();
+        // qDebug() << "Quantity:" << asset.getQuantity();
+        // qDebug() << "Sell Date:" << asset.getSellDate();
+        // qDebug() << "Sell Price:" << asset.getSellPrice();
+        // qDebug() << "Status:" << Transaction::statusToString(asset.getStatus());
+        // qDebug() << "Inflation Index At Buy:" << asset.getInflationIndexAtBuy();
+        // qDebug() << "Exchange Rate At Buy:" << asset.getExchangeRateAtBuy();
+        // qDebug() << "Inflation Index At Sell:" << asset.getInflationIndexAtSell();
+        // qDebug() << "Exchange Rate At Sell:" << asset.getExchangeRateAtSell();
+        // qDebug() << "Tax Base:" << asset.getTaxBase();
+        // qDebug() << "Tax:" << asset.getTax();
+        // qDebug() << "===============================";
         
         assets.push_back(asset);
     }

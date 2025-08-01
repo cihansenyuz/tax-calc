@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 
-#include "../inc/assetmanager.hpp"
+#include "../inc/transactionmanager.hpp"
 #include "../inc/network/evdsfetcher.hpp"
 #include "../inc/network/httpmanager.hpp"
 #include "transactiontable.hpp"
@@ -30,7 +30,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::unique_ptr<CreateDialog> m_create_dialog;
-    AssetManager *m_asset_manager;
+    TransactionManager *m_asset_manager;
     TransactionTable m_table{this};
 
     void calculateTotalTaxBase(double potential = 0.0);

@@ -22,13 +22,13 @@ void CreateDialog::onOkClicked() {
         return;
     }
 
-    Asset newAsset = Asset::createWithUniqueId(symbolStr.toStdString(),
+    Transaction newTransaction = Transaction::createWithUniqueId(symbolStr.toStdString(),
                                             nameStr.toStdString(),
                                             date,
                                             price,
                                             quantity
                                         );
-    emit assetCreated(newAsset);
+    emit assetCreated(newTransaction);
     accept();
 }
 

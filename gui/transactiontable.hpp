@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QTableWidget>
-#include "../inc/asset.hpp"
+#include "../inc/transaction.hpp"
 
 class TransactionTable : public QTableWidget {
 public:
@@ -13,51 +13,51 @@ public:
         resizeColumnsToContents();
     }
 
-    void refresh(const std::vector<Asset> &assets) {
+    void refresh(const std::vector<Transaction> &transactions) {
         clearContents();
         setRowCount(0);
 
-        unsigned int rowCount = assets.size();
+        unsigned int rowCount = transactions.size();
         setRowCount(rowCount);
 
         for (unsigned int currentRow = 0; currentRow < rowCount; currentRow++) {
-            const Asset &asset = assets.at(currentRow);
+            const Transaction &transaction = transactions.at(currentRow);
 
-        QTableWidgetItem *item = new QTableWidgetItem(QString::number(asset.getId()));
+        QTableWidgetItem *item = new QTableWidgetItem(QString::number(transaction.getId()));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 0, item);
 
-        item = new QTableWidgetItem(QString::fromStdString(asset.getSymbol()));
+        item = new QTableWidgetItem(QString::fromStdString(transaction.getSymbol()));
         setItem(currentRow, 1, item);
 
-        item = new QTableWidgetItem(QString::fromStdString(asset.getSymbolName()));
+        item = new QTableWidgetItem(QString::fromStdString(transaction.getSymbolName()));
         setItem(currentRow, 2, item);
 
-        item = new QTableWidgetItem(QString::number(asset.getQuantity()));
+        item = new QTableWidgetItem(QString::number(transaction.getQuantity()));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 3, item);
 
-        item = new QTableWidgetItem(asset.getBuyDate());
+        item = new QTableWidgetItem(transaction.getBuyDate());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 4, item);
 
-        item = new QTableWidgetItem(QString::number(asset.getBuyPrice()));
+        item = new QTableWidgetItem(QString::number(transaction.getBuyPrice()));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 5, item);
 
-        item = new QTableWidgetItem(asset.getSellDate());
+        item = new QTableWidgetItem(transaction.getSellDate());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 6, item);
 
-        item = new QTableWidgetItem(QString::number(asset.getSellPrice()));
+        item = new QTableWidgetItem(QString::number(transaction.getSellPrice()));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 7, item);
 
-        item = new QTableWidgetItem(asset.getStatus());
+        item = new QTableWidgetItem(transaction.getStatus());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 8, item);
         
-        item = new QTableWidgetItem(QString::number(asset.getTaxBase()));
+        item = new QTableWidgetItem(QString::number(transaction.getTaxBase()));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 9, item);
         }

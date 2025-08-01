@@ -16,15 +16,15 @@ set(PROJECT_SOURCES
         src/network/networkcore.cpp
         src/network/getrequest.cpp
         src/network/evdsfetcher.cpp
-        src/database/assetdatabase.cpp
-        src/assetmanager.cpp
+        src/database/transactiondatabase.cpp
+        src/transactionmanager.cpp
 
         inc/network/networkcore.hpp
         inc/network/getrequest.hpp
         inc/network/httpmanager.hpp
         inc/network/evdsfetcher.hpp
-        inc/database/assetdatabase.hpp
-        inc/assetmanager.hpp
+        inc/database/transactiondatabase.hpp
+        inc/transactionmanager.hpp
         inc/calculator.hpp
 
         gui/mainwindow.ui

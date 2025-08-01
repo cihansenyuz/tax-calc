@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDialog>
-#include "../inc/asset.hpp"
+#include "../inc/transaction.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dialog; }
@@ -20,7 +20,7 @@ public:
     QDate buyDate() const;
 
 signals:
-    void assetCreated(const Asset &new_asset);
+    void assetCreated(const Transaction &new_transaction);
 
 private slots:
     void onOkClicked();

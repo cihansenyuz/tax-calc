@@ -1,94 +1,94 @@
-#include "../inc/assetmanager.hpp"
+#include "../inc/transactionmanager.hpp"
 #include "../inc/network/evdsfetcher.hpp"
 #include "../inc/network/httpmanager.hpp"
 #include "../inc/calculator.hpp"
 #include <QDebug>
 
-AssetManager::AssetManager(QObject *parent)
+TransactionManager::TransactionManager(QObject *parent)
     : QObject(parent) {
     m_http_manager = new HttpManager();
     m_http_manager->setKey(EvdsFetcher::API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
-    connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &AssetManager::onEvdsDataFetched);
-    connect(m_evds_fetcher, &EvdsFetcher::fetchFailed, this, &AssetManager::onFetchFailed);
+    connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &TransactionManager::onEvdsDataFetched);
+    connect(m_evds_fetcher, &EvdsFetcher::fetchFailed, this, &TransactionManager::onFetchFailed);
     
-    m_asset_db = & AssetDatabase::getInstance("assets.db");
+    m_asset_db = & TransactionDatabase::getInstance("assets.db");
     if(!m_asset_db->initAssetTable())
         throw std::runtime_error("Failed to initialize asset database table");
 
-    m_assets = m_asset_db->loadAssets();
+    m_transactions = m_asset_db->loadAssets();
 }
 
-AssetManager::~AssetManager() {
+TransactionManager::~TransactionManager() {
     delete m_evds_fetcher;
     delete m_http_manager;
 }
 
-void AssetManager::openTransaction(const Asset& asset) {
+void TransactionManager::openTransaction(const Transaction& transaction) {
     std::unique_lock<std::mutex> lock(m_mutex);
-    m_asset_to_be_updated = asset;
+    m_transaction_to_be_updated = transaction;
     m_currentTransactionType = TransactionType::Open;
     m_exchangeRateReceived = false;
     m_inflationIndexReceived = false;
     m_data_to_be_updated = {0.0, 0.0}; // Reset data
     
-    m_evds_fetcher->fetchExchangeRate(asset.getBuyQDate());
-    m_evds_fetcher->fetchInflationIndex(asset.getBuyQDate());
+    m_evds_fetcher->fetchExchangeRate(transaction.getBuyQDate());
+    m_evds_fetcher->fetchInflationIndex(transaction.getBuyQDate());
 }
 
-void AssetManager::processOpenTransaction() {
+void TransactionManager::processOpenTransaction() {
     std::unique_lock<std::mutex> lock(m_mutex);
 
-    m_asset_to_be_updated.setExchangeRateAtBuy(m_data_to_be_updated.first);
-    m_asset_to_be_updated.setInflationIndexAtBuy(m_data_to_be_updated.second);
+    m_transaction_to_be_updated.setExchangeRateAtBuy(m_data_to_be_updated.first);
+    m_transaction_to_be_updated.setInflationIndexAtBuy(m_data_to_be_updated.second);
 
-    if(!m_asset_db->saveAsset(m_asset_to_be_updated))
+    if(!m_asset_db->saveAsset(m_transaction_to_be_updated))
         throw std::runtime_error("Failed to save asset to database");
 
-    m_assets.push_back(m_asset_to_be_updated);
+    m_transactions.push_back(m_transaction_to_be_updated);
 
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
 
     emit databaseReady();
 }
 
-void AssetManager::closeTransaction(const Asset& asset) {
+void TransactionManager::closeTransaction(const Transaction& transaction) {
     std::unique_lock<std::mutex> lock(m_mutex);
-    m_asset_to_be_updated = asset;
+    m_transaction_to_be_updated = transaction;
     m_currentTransactionType = TransactionType::Close;
     m_exchangeRateReceived = false;
     m_inflationIndexReceived = false;
     m_data_to_be_updated = {0.0, 0.0}; // Reset data
 
-    m_evds_fetcher->fetchExchangeRate(asset.getSellQDate());
-    m_evds_fetcher->fetchInflationIndex(asset.getSellQDate());
+    m_evds_fetcher->fetchExchangeRate(transaction.getSellQDate());
+    m_evds_fetcher->fetchInflationIndex(transaction.getSellQDate());
 }
 
-void AssetManager::potentialTransaction(const Asset& asset) {
+void TransactionManager::potentialTransaction(const Transaction& transaction) {
     std::unique_lock<std::mutex> lock(m_mutex);
-    m_asset_to_be_updated = asset;
+    m_transaction_to_be_updated = transaction;
     m_currentTransactionType = TransactionType::Potential;
     m_exchangeRateReceived = false;
     m_inflationIndexReceived = false;
     m_data_to_be_updated = {0.0, 0.0}; // Reset data
 
-    m_evds_fetcher->fetchExchangeRate(asset.getSellQDate());
-    m_evds_fetcher->fetchInflationIndex(asset.getSellQDate());
+    m_evds_fetcher->fetchExchangeRate(transaction.getSellQDate());
+    m_evds_fetcher->fetchInflationIndex(transaction.getSellQDate());
 }
 
-void AssetManager::processCloseTransaction() {
+void TransactionManager::processCloseTransaction() {
     std::unique_lock<std::mutex> lock(m_mutex);
-    m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
-    m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
+    m_transaction_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
+    m_transaction_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
 
-    m_asset_to_be_updated.setTaxBase(Calculator::calculateTaxBase(m_asset_to_be_updated));
+    m_transaction_to_be_updated.setTaxBase(Calculator::calculateTaxBase(m_transaction_to_be_updated));
 
-    if(!m_asset_db->updateAsset(m_asset_to_be_updated))
+    if(!m_asset_db->updateAsset(m_transaction_to_be_updated))
         throw std::runtime_error("Failed to update asset in database");
 
-    for(auto& asset : m_assets){
-        if (asset.getId() == m_asset_to_be_updated.getId()) {
-            asset = m_asset_to_be_updated; // Update the existing asset
+    for(auto& transaction : m_transactions){
+        if (transaction.getId() == m_transaction_to_be_updated.getId()) {
+            transaction = m_transaction_to_be_updated; // Update the existing transaction
             break;
         }
     }
@@ -98,17 +98,17 @@ void AssetManager::processCloseTransaction() {
     emit databaseReady();
 }
 
-void AssetManager::processPotentialTransaction() {
+void TransactionManager::processPotentialTransaction() {
     std::unique_lock<std::mutex> lock(m_mutex);
-    m_asset_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
-    m_asset_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
-    double potentialTaxBase = Calculator::calculateTaxBase(m_asset_to_be_updated);
+    m_transaction_to_be_updated.setExchangeRateAtSell(m_data_to_be_updated.first);
+    m_transaction_to_be_updated.setInflationIndexAtSell(m_data_to_be_updated.second);
+    double potentialTaxBase = Calculator::calculateTaxBase(m_transaction_to_be_updated);
 
     m_data_to_be_updated = {0.0, 0.0}; // Reset after use
     emit potentialTaxBaseReady(potentialTaxBase);
 }
 
-void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
+void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
                                     const QString &seriesCode) {
     qDebug() << "EVDS data fetched for series:" << seriesCode;
     
@@ -201,24 +201,24 @@ void AssetManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
     }
 }
 
-Asset AssetManager::findAssetById(int id) {
+Transaction TransactionManager::findTransactionById(int id) {
     std::unique_lock<std::mutex> lock(m_mutex);
-    for (const auto& asset : m_assets) {
-        if (asset.getId() == id) {
-            return asset;
+    for (const auto& transaction : m_transactions) {
+        if (transaction.getId() == id) {
+            return transaction;
         }
     }
     throw std::runtime_error{"Asset with ID " + std::to_string(id) + " not found."};
 }
 
-void AssetManager::removeAsset(int id) {
+void TransactionManager::removeTransaction(int id) {
     if(m_asset_db->deleteAsset(id)) {
         std::unique_lock<std::mutex> lock(m_mutex);
-        auto it = std::remove_if(m_assets.begin(), m_assets.end(),
-                                [id](const Asset& asset) { return asset.getId() == id; });
+        auto it = std::remove_if(m_transactions.begin(), m_transactions.end(),
+                                [id](const Transaction& transaction) { return transaction.getId() == id; });
         
-        if (it != m_assets.end()) {
-            m_assets.erase(it, m_assets.end());
+        if (it != m_transactions.end()) {
+            m_transactions.erase(it, m_transactions.end());
         }
 
         emit databaseReady();   
@@ -228,7 +228,7 @@ void AssetManager::removeAsset(int id) {
     }
 }
 
-void AssetManager::onFetchFailed(const QString &error) {
+void TransactionManager::onFetchFailed(const QString &error) {
     m_currentTransactionType = TransactionType::None;
     m_exchangeRateReceived = false;
     m_inflationIndexReceived = false;

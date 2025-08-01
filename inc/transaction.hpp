@@ -2,9 +2,9 @@
 #include <string>
 #include <QDate>
 
-#include "../inc/database/assetdatabase.hpp"
+#include "../inc/database/transactiondatabase.hpp"
 
-class Asset {
+class Transaction {
 private:
     int m_id = -1;
     std::string m_symbol;
@@ -23,8 +23,8 @@ private:
     double m_taxBase;
 
 public:
-    Asset() = default;
-    Asset(int id,
+    Transaction() = default;
+    Transaction(int id,
           const std::string& symbol,
           const std::string& symbolName,
           QDate buyDate,
@@ -55,7 +55,7 @@ public:
           m_tax(tax),
           m_taxBase(taxBase) {}
 
-    static Asset createWithUniqueId(
+    static Transaction createWithUniqueId(
            const std::string& symbol,
            const std::string& symbolName,
            QDate buyDate,
@@ -64,8 +64,8 @@ public:
         int id;
         do {
             id = rand();
-        } while (AssetDatabase::getInstance().idExists(id));
-        return Asset(id, symbol, symbolName, buyDate, buyPrice, quantity);
+        } while (TransactionDatabase::getInstance().idExists(id));
+        return Transaction(id, symbol, symbolName, buyDate, buyPrice, quantity);
     }
 
     int getId() const { return m_id; }

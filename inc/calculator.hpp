@@ -1,22 +1,22 @@
 #pragma once
 
-#include "asset.hpp"
+#include "transaction.hpp"
 
 class Calculator {
 public:
-    static double calculateTax(const Asset &asset){
+    static double calculateTax(const Transaction &transaction){
         double tax = 0.0;
         // taxBase = taxbase * taxRate
         // TO DO: learn taxRate ranges and implement calculation
         return tax;
     }
 
-    static double calculateTaxBase(const Asset &asset){
-        double sellPrice = asset.getExchangeRateAtSell() * (asset.getSellPrice() * asset.getQuantity() - 1.5);
-        double buyPrice = asset.getExchangeRateAtBuy() * (asset.getBuyPrice() * asset.getQuantity() + 1.5);
+    static double calculateTaxBase(const Transaction &transaction){
+        double sellPrice = transaction.getExchangeRateAtSell() * (transaction.getSellPrice() * transaction.getQuantity() - 1.5);
+        double buyPrice = transaction.getExchangeRateAtBuy() * (transaction.getBuyPrice() * transaction.getQuantity() + 1.5);
 
         try{
-            double inflationScaler = asset.getInflationIndexAtSell() / asset.getInflationIndexAtBuy();
+            double inflationScaler = transaction.getInflationIndexAtSell() / transaction.getInflationIndexAtBuy();
             double taxBase = 0.0;
 
             if(inflationScaler >= 1.1)

@@ -5,24 +5,25 @@
 #include "../inc/database/transactiondatabase.hpp"
 
 class Transaction {
-private:
-    int m_id = -1;
-    std::string m_symbol;
-    std::string m_symbolName;
-    QDate m_buyDate;
-    double m_buyPrice;
-    int m_quantity;
-    QDate m_sellDate;
-    double m_sellPrice;
-    QString m_status;
-    double m_inflationIndexAtBuy;
-    double m_exchangeRateAtBuy;
-    double m_inflationIndexAtSell;
-    double m_exchangeRateAtSell;
-    double m_tax;
-    double m_taxBase;
-
 public:
+    enum class Status {
+        Unknown,
+        Open,
+        Closed
+    };
+    static QString statusToString(Status status) {
+        switch (status) {
+            case Status::Open:   return "Açık";
+            case Status::Closed: return "Kapalı";
+            default:            return "Bilinmiyor";
+        }
+    };
+    static Status stringToStatus(const QString& statusStr) {
+        if (statusStr == "Açık") return Status::Open;
+        if (statusStr == "Kapalı") return Status::Closed;
+        return Status::Unknown;
+    }
+
     Transaction() = default;
     Transaction(int id,
           const std::string& symbol,
@@ -32,7 +33,7 @@ public:
           int quantity,
           QDate sellDate = QDate(),
           double sellPrice = 0.0,
-          const QString& status = "Açık",
+          Status status = Status::Open,
           double inflationIndexAtBuy = 0.0,
           double exchangeRateAtBuy = 0.0,
           double inflationIndexAtSell = 0.0,
@@ -78,7 +79,7 @@ public:
     QString getSellDate() const { return m_sellDate.isValid() ? m_sellDate.toString("dd-MM-yyyy") : ""; }
     QDate getSellQDate() const { return m_sellDate; }
     double getSellPrice() const { return m_sellPrice; }
-    QString getStatus() const { return m_status; }
+    Status getStatus() const { return m_status; }
     double getInflationIndexAtBuy() const { return m_inflationIndexAtBuy; }
     double getExchangeRateAtBuy() const { return m_exchangeRateAtBuy; }
     double getInflationIndexAtSell() const { return m_inflationIndexAtSell; }
@@ -93,11 +94,28 @@ public:
     void setQuantity(int q) { m_quantity = q; }
     void setSellDate(const QDate& d) { m_sellDate = d; }
     void setSellPrice(double p) { m_sellPrice = p; }
-    void setStatus(const QString& s) { m_status = s; }
+    void setStatus(Status s) { m_status = s; }
     void setInflationIndexAtBuy(double i) { m_inflationIndexAtBuy = i; }
     void setExchangeRateAtBuy(double r) { m_exchangeRateAtBuy = r; }
     void setInflationIndexAtSell(double i) { m_inflationIndexAtSell = i; }
     void setExchangeRateAtSell(double r) { m_exchangeRateAtSell = r; }
     void setTax(double t) { m_tax = t; }
     void setTaxBase(double tb) { m_taxBase = tb; }
+
+private:
+    int m_id = -1;
+    std::string m_symbol;
+    std::string m_symbolName;
+    QDate m_buyDate;
+    double m_buyPrice;
+    int m_quantity;
+    QDate m_sellDate;
+    double m_sellPrice;
+    Status m_status = Status::Open;
+    double m_inflationIndexAtBuy;
+    double m_exchangeRateAtBuy;
+    double m_inflationIndexAtSell;
+    double m_exchangeRateAtSell;
+    double m_tax;
+    double m_taxBase;
 };

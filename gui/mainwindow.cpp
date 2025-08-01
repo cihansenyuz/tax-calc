@@ -20,23 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCleanSelectionButtonClicked);
     connect(m_asset_manager, &TransactionManager::fetchFailed,
             this, &MainWindow::onFetchFailed);
-
-    connect(ui->selectButton, &QPushButton::clicked, this, [this]() {
-        int selectedRow = m_table.currentRow();
-        if (selectedRow < 0) {
-            QMessageBox::warning(this, "Seçim Hatası", "Lütfen kapatılacak bir işlem seçin.");
-            return;
-        }
-        QTableWidgetItem *item = m_table.item(selectedRow, 0);
-        if (!item) {
-            QMessageBox::warning(this, "Seçim Hatası", "Geçerli bir işlem seçilmedi.");
-            return;
-        }
-        Transaction selectedTransaction = m_asset_manager->findTransactionById(item->text().toInt());
-        ui->symbolLabel->setText(QString::fromStdString(selectedTransaction.getSymbol()));
-        ui->quantityLabel->setText(QString::number(selectedTransaction.getQuantity()));
-        ui->IDlabel->setText(QString::number(selectedTransaction.getId()));
-    });
+    connect(ui->selectButton, &QPushButton::clicked,
+            this, &MainWindow::onSelectButtonClicked);
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(m_asset_manager->getTransactions());
@@ -50,7 +35,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::onDatabaseReady() {
-    qDebug() << "Database is ready, refreshing table.";
+    // qDebug() << "Database is ready, refreshing table.";
     m_table.refresh(m_asset_manager->getTransactions());
     calculateTotalTaxBase();
 }
@@ -91,7 +76,8 @@ void MainWindow::onDeletePositionButtonClicked() {
 
 void MainWindow::onCloseTransactionButtonClicked() {
     if (ui->IDlabel->text().isEmpty()) {
-        return; // No selection
+        QMessageBox::warning(this, "Giriş Hatası", "Kapatılacak pozisyon seçilmedi.");
+        return;
     }
 
     Transaction selectedTransaction = m_asset_manager->findTransactionById(ui->IDlabel->text().toInt());
@@ -105,7 +91,7 @@ void MainWindow::onCloseTransactionButtonClicked() {
 
     selectedTransaction.setSellDate(sellDate);
     selectedTransaction.setSellPrice(sellPrice);
-    selectedTransaction.setStatus("Kapalı");
+    selectedTransaction.setStatus(Transaction::Status::Closed);
 
     m_asset_manager->closeTransaction(selectedTransaction);
 }
@@ -144,7 +130,7 @@ void MainWindow::calculateTotalTaxBase(double potential) {
     double totalTaxBase = 0.0;
     
     for(const auto &transaction : m_asset_manager->getTransactions()) {
-        if (transaction.getStatus() == "Kapalı") {
+        if (transaction.getStatus() == Transaction::Status::Closed) {
             QDate sellDate = transaction.getSellQDate();
             
             if(sellDate.year() == QDate::currentDate().year()) {
@@ -155,4 +141,21 @@ void MainWindow::calculateTotalTaxBase(double potential) {
 
     totalTaxBase += potential;
     ui->totalTaxBaseLabel->setText(QString::number(totalTaxBase, 'f', 2) + " ₺");
+}
+
+void MainWindow::onSelectButtonClicked() {
+    int selectedRow = m_table.currentRow();
+    if (selectedRow < 0) {
+        QMessageBox::warning(this, "Seçim Hatası", "Lütfen kapatılacak bir işlem seçin.");
+        return;
+    }
+    QTableWidgetItem *item = m_table.item(selectedRow, 0);
+    if (!item) {
+        QMessageBox::warning(this, "Seçim Hatası", "Geçerli bir işlem seçilmedi.");
+        return;
+    }
+    Transaction selectedTransaction = m_asset_manager->findTransactionById(item->text().toInt());
+    ui->symbolLabel->setText(QString::fromStdString(selectedTransaction.getSymbol()));
+    ui->quantityLabel->setText(QString::number(selectedTransaction.getQuantity()));
+    ui->IDlabel->setText(QString::number(selectedTransaction.getId()));
 }

@@ -71,7 +71,7 @@ bool TransactionDatabase::saveAsset(const Transaction& transaction) {
     query.addBindValue(transaction.getQuantity());
     query.addBindValue(transaction.getSellDate());
     query.addBindValue(transaction.getSellPrice());
-    query.addBindValue(transaction.getStatus());
+    query.addBindValue(Transaction::statusToString(transaction.getStatus()));
     query.addBindValue(transaction.getInflationIndexAtBuy());
     query.addBindValue(transaction.getExchangeRateAtBuy());
     query.addBindValue(transaction.getInflationIndexAtSell());
@@ -97,7 +97,7 @@ bool TransactionDatabase::updateAsset(const Transaction& transaction) {
     query.addBindValue(transaction.getQuantity());
     query.addBindValue(transaction.getSellDate());
     query.addBindValue(transaction.getSellPrice());
-    query.addBindValue(transaction.getStatus());
+    query.addBindValue(Transaction::statusToString(transaction.getStatus()));
     query.addBindValue(transaction.getInflationIndexAtBuy());
     query.addBindValue(transaction.getExchangeRateAtBuy());
     query.addBindValue(transaction.getInflationIndexAtSell());
@@ -146,7 +146,7 @@ std::vector<Transaction> TransactionDatabase::loadAssets()
             query.value(5).toInt(), // quantity
             QDate::fromString(query.value(6).toString(), "dd-MM-yyyy"), // sellDate
             query.value(7).toDouble(), // sellPrice
-            query.value(8).toString(), // status
+            Transaction::stringToStatus(query.value(8).toString()), // status
             query.value(9).toDouble(), // inflationIndexAtBuy
             query.value(10).toDouble(), // exchangeRateAtBuy
             query.value(11).toDouble(), // inflationIndexAtSell
@@ -165,7 +165,7 @@ std::vector<Transaction> TransactionDatabase::loadAssets()
         qDebug() << "Quantity:" << asset.getQuantity();
         qDebug() << "Sell Date:" << asset.getSellDate();
         qDebug() << "Sell Price:" << asset.getSellPrice();
-        qDebug() << "Status:" << asset.getStatus();
+        qDebug() << "Status:" << Transaction::statusToString(asset.getStatus());
         qDebug() << "Inflation Index At Buy:" << asset.getInflationIndexAtBuy();
         qDebug() << "Exchange Rate At Buy:" << asset.getExchangeRateAtBuy();
         qDebug() << "Inflation Index At Sell:" << asset.getInflationIndexAtSell();

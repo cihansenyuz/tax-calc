@@ -7,11 +7,12 @@ class TransactionTable : public QTableWidget {
 public:
     explicit TransactionTable(QWidget *parent = nullptr)
         : QTableWidget(parent) {
-        
-        setColumnCount(m_columnCount);
-        setHorizontalHeaderLabels(m_labels);
-        resizeColumnsToContents();
-    }
+
+    setColumnCount(m_columnCount);
+    setHorizontalHeaderLabels(m_labels);
+    setMinimumSize(800, 400);
+    resizeColumnsToContents();
+}
 
     void refresh(const std::vector<Transaction> &transactions) {
         clearContents();
@@ -53,7 +54,7 @@ public:
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 7, item);
 
-        item = new QTableWidgetItem(transaction.getStatus());
+        item = new QTableWidgetItem(Transaction::statusToString(transaction.getStatus()));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 8, item);
         

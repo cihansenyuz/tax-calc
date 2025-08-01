@@ -67,7 +67,7 @@ public:
 
 private:
     QStringList m_labels{
-        "Kayıt No", "Sembol", "İsim", "Adet", "Alış Tarihi",
+        "Pozisyon No", "Sembol", "İsim", "Adet", "Alış Tarihi",
         "Alış Fiyatı", "Satış Tarihi", "Satış Fiyatı",
         "Durum", "Vergi Matrahı"
     };

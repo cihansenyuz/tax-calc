@@ -41,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(m_asset_manager->getAssets());
+
+    calculateTotalTaxBase();
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +55,7 @@ void MainWindow::onDatabaseReady()
 {
     qDebug() << "Database is ready, refreshing table.";
     m_table.refresh(m_asset_manager->getAssets());
+    calculateTotalTaxBase();
 }
 
 void MainWindow::onCleanSelectionButtonClicked()
@@ -133,11 +136,30 @@ void MainWindow::onPotentialCalculateButtonClicked(){
 
     connect(m_asset_manager, &AssetManager::potentialTaxBaseReady,
             this, [this](double potentialTaxBase) {
-                ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2));
+                ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2) + " ₺");
+                calculateTotalTaxBase(potentialTaxBase);
             }, Qt::SingleShotConnection);
     m_asset_manager->potentialTransaction(selectedAsset);
 }
 
 void MainWindow::onFetchFailed(const QString &error) {
     QMessageBox::warning(this, "İşlem Başarısız", error);
+}
+
+void MainWindow::calculateTotalTaxBase(double potential) {
+
+    double totalTaxBase = 0.0;
+    
+    for(const auto &asset : m_asset_manager->getAssets()) {
+        if (asset.getStatus() == "Kapalı") {
+            QDate sellDate = asset.getSellQDate();
+            
+            if(sellDate.year() == QDate::currentDate().year()) {
+                totalTaxBase += asset.getTaxBase();
+            }
+        }
+    }
+
+    totalTaxBase += potential;
+    ui->totalTaxBaseLabel->setText(QString::number(totalTaxBase, 'f', 2) + " ₺");
 }

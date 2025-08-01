@@ -33,6 +33,8 @@ private:
     std::unique_ptr<CreateDialog> m_create_dialog;
     AssetManager *m_asset_manager;
     TransactionTable m_table{this};
+
+    void calculateTotalTaxBase(double potential = 0.0);
 };
 
 #endif // MAINWINDOW_HPP

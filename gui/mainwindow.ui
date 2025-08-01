@@ -281,49 +281,15 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Bugün Kapatırsam?</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,1">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_11">
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="title">
+         <string>Bu Yılki Matrahım?</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Satış Fiyatı</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="potentialSellPriceSpinBox">
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-           <property name="maximum">
-            <double>9999.989999999999782</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_12">
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Vergi Matrahı</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="potentialCalculatedTaxLabel">
+          <widget class="QLabel" name="totalTaxBaseLabel">
            <property name="font">
             <font>
              <pointsize>14</pointsize>
@@ -339,16 +305,79 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QPushButton" name="calculatePotentialTaxButton">
-         <property name="text">
-          <string>Hesapla</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Bugün Kapatırsam?</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,1">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Satış Fiyatı</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="potentialSellPriceSpinBox">
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+             <property name="maximum">
+              <double>9999.989999999999782</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Vergi Matrahı</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="potentialCalculatedTaxLabel">
+             <property name="font">
+              <font>
+               <pointsize>14</pointsize>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="calculatePotentialTaxButton">
+           <property name="text">
+            <string>Hesapla</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

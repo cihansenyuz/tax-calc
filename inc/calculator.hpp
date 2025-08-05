@@ -24,7 +24,7 @@ public:
             else
                 taxBase = (sellPrice - buyPrice);
 
-            return taxBase;
+            return taxBase < 0 ? 0.0 : taxBase;
         }
         catch (const std::exception& e) {
             qDebug() << "Error calculating tax base: " << e.what();

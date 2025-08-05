@@ -1,3 +1,5 @@
 build/
 fetched_data.json
-.vscode/draft-series-*.json
+.vscode/
+draft-series-*.json
+fetched_data*.json

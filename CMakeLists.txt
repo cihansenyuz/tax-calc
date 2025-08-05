@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_PREFIX_PATH "/home/cihan/Qt/6.9.1/gcc_64/lib/cmake") # for ubuntu
-set(CMAKE_PREFIX_PATH "C:\\Qt\\6.9.0\\llvm-mingw_64\\lib\\cmake") # for windows
+# set(CMAKE_PREFIX_PATH "C:\\Qt\\6.9.0\\llvm-mingw_64\\lib\\cmake") # for windows
 find_package(Qt6 REQUIRED COMPONENTS Widgets Network Sql)
 
 set(PROJECT_SOURCES
@@ -17,6 +17,7 @@ set(PROJECT_SOURCES
         src/network/networkcore.cpp
         src/network/getrequest.cpp
         src/network/evdsfetcher.cpp
+        src/network/yahoofinancefetcher.cpp
         src/database/transactiondatabase.cpp
         src/transactionmanager.cpp
 
@@ -24,6 +25,7 @@ set(PROJECT_SOURCES
         inc/network/getrequest.hpp
         inc/network/httpmanager.hpp
         inc/network/evdsfetcher.hpp
+        inc/network/yahoofinancefetcher.hpp
         inc/database/transactiondatabase.hpp
         inc/transactionmanager.hpp
         inc/calculator.hpp

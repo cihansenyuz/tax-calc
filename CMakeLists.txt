@@ -7,7 +7,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_PREFIX_PATH "/home/cihan/Qt/6.9.1/gcc_64/lib/cmake")
+set(CMAKE_PREFIX_PATH "/home/cihan/Qt/6.9.1/gcc_64/lib/cmake") # for ubuntu
+set(CMAKE_PREFIX_PATH "C:\\Qt\\6.9.0\\llvm-mingw_64\\lib\\cmake") # for windows
 find_package(Qt6 REQUIRED COMPONENTS Widgets Network Sql)
 
 set(PROJECT_SOURCES

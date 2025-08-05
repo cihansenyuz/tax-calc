@@ -5,6 +5,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    QString appName = QCoreApplication::applicationName();
+    QString version = QCoreApplication::applicationVersion();
+    setWindowTitle(QString("%1 v%2").arg(appName, version));
+
     m_asset_manager = new TransactionManager(this);
     connect(ui->createButton, &QPushButton::clicked,
             this, &MainWindow::onCreateButtonClicked);

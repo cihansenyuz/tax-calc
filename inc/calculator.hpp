@@ -4,10 +4,11 @@
 
 class Calculator {
 public:
-    static double calculateTax(const Transaction &transaction){
+    static double calculateTax(double taxBase, double taxRate, double declaretionLimit) {
         double tax = 0.0;
-        // taxBase = taxbase * taxRate
-        // TO DO: learn taxRate ranges and implement calculation
+        if (taxBase > declaretionLimit) {
+            tax = taxBase * taxRate;
+        }
         return tax;
     }
 

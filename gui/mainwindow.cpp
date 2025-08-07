@@ -1,5 +1,6 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
+#include "../inc/calculator.hpp"
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -160,14 +161,9 @@ void MainWindow::calculateTotalTaxBase(double potential) {
     totalTaxBase += potential;
     ui->totalTaxBaseLabel->setText(QString::number(totalTaxBase, 'f', 2) + " ₺");
 
-    if (totalTaxBase < ui->declaretionLimitSpinBox->value()) {
-        ui->calculatedTaxLabel->setText(QString::number(0, 'f', 2) + " ₺");
-        return;
-    }
-
-    double taxRate = ui->taxRangesComboBox->currentData().toDouble();
-    qDebug() << "tax rate: " << taxRate;
-    double calculatedTax = totalTaxBase * taxRate;
+    double calculatedTax = Calculator::calculateTax(totalTaxBase,
+                            ui->taxRangesComboBox->currentData().toDouble(),
+                            ui->declaretionLimitSpinBox->value());
     ui->calculatedTaxLabel->setText(QString::number(calculatedTax, 'f', 2) + " ₺");
 }
 

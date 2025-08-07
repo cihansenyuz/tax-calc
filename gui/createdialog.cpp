@@ -45,6 +45,8 @@ CreateDialog::CreateDialog(QWidget *parent)
         this, [this]() {
             m_searchTimer->start(); // Restarts the timer on each keystroke
     });
+
+    ui->buyDateEdit->setDate(QDate::currentDate());
 }
 
 void CreateDialog::onAssetSelected(const QString &selection) {

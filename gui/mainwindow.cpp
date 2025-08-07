@@ -29,6 +29,20 @@ MainWindow::MainWindow(QWidget *parent)
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(m_asset_manager->getTransactions());
+    
+    ui->sellDateEdit->setDate(QDate::currentDate());
+    ui->taxRangesComboBox->addItem("15%", 0.15);
+    ui->taxRangesComboBox->addItem("20%", 0.20);
+    ui->taxRangesComboBox->addItem("27%", 0.27);
+    ui->taxRangesComboBox->addItem("35%", 0.35);
+    ui->taxRangesComboBox->addItem("40%", 0.40);
+    connect(ui->taxRangesComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() {
+               if(ui->potentialCalculatedTaxLabel->text().isEmpty())
+                    calculateTotalTaxBase();
+                else
+                    calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
+            });
 
     calculateTotalTaxBase();
 }
@@ -145,6 +159,16 @@ void MainWindow::calculateTotalTaxBase(double potential) {
 
     totalTaxBase += potential;
     ui->totalTaxBaseLabel->setText(QString::number(totalTaxBase, 'f', 2) + " ₺");
+
+    if (totalTaxBase < ui->declaretionLimitSpinBox->value()) {
+        ui->calculatedTaxLabel->setText(QString::number(0, 'f', 2) + " ₺");
+        return;
+    }
+
+    double taxRate = ui->taxRangesComboBox->currentData().toDouble();
+    qDebug() << "tax rate: " << taxRate;
+    double calculatedTax = totalTaxBase * taxRate;
+    ui->calculatedTaxLabel->setText(QString::number(calculatedTax, 'f', 2) + " ₺");
 }
 
 void MainWindow::onSelectButtonClicked() {

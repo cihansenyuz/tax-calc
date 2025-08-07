@@ -13,8 +13,9 @@ YahooFinanceFetcher::YahooFinanceFetcher(HttpManager *http_manager, QObject *par
 
 void YahooFinanceFetcher::fetchSymbols(const QString &query) {
     QString encodedQuery = QUrl::toPercentEncoding(query);
-    QString api_query = QString("%1?q=%2&%3&%4").arg(apiEndPoint, encodedQuery, quotesField, newsCountField);
-    http_manager_->fetchJsonData(api_query);
+    QString url = QString("%1?q=%2&%3&%4").arg(apiEndPoint, encodedQuery, quotesField, newsCountField);
+    qDebug() << "Fetching symbols with query:" << url;
+    http_manager_->fetchJsonData(url);
 }
 
 void YahooFinanceFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &json) {

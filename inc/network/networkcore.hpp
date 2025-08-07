@@ -3,8 +3,6 @@
 #include <QObject>
 #include <QtNetwork>
 
-#define HOST "https://evds2.tcmb.gov.tr/service/evds/series="
-
 class HttpManager;
 
 class NetworkCore : public QObject {
@@ -13,12 +11,11 @@ public:
     NetworkCore() = default;
     virtual QNetworkReply* getHttpReply(const QNetworkRequest &request) = 0;
     template<typename T>
-    void sendHttpRequest(const QString &api_query,
+    void sendHttpRequest(const QString &full_url,
                          const QString &key,
                          T* requester_object,
                          void (T::*slot_function)(QNetworkReply*)){
-        QUrl http_url(QString(HOST) + api_query);
-        QNetworkRequest http_request(http_url);
+        QNetworkRequest http_request(QUrl{full_url});
         http_request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
         if(key.size())

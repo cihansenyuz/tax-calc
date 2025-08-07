@@ -9,17 +9,17 @@ EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)
 void EvdsFetcher::fetchExchangeRate(QDate date) {
     QString startDate = date.addDays(-3).toString("dd-MM-yyyy");
     QString endDate = date.toString("dd-MM-yyyy");
-    QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
-                        .arg(SERIES_USD, startDate, endDate);
-    http_manager_->fetchJsonData(query);
+    QString url = QString("%1%2&startDate=%3&endDate=%4&type=json&aggregationTypes=last")
+                        .arg(API_END_POINT, SERIES_USD, startDate, endDate);
+    http_manager_->fetchJsonData(url);
 }
 
 void EvdsFetcher::fetchInflationIndex(QDate date) {
     QString startDate = date.addMonths(-1).toString("dd-MM-yyyy");
     QString endDate = startDate;
-    QString query = QString("%1&startDate=%2&endDate=%3&type=json&aggregationTypes=last")
-                        .arg(SERIES_INFLATION, startDate, endDate);
-    http_manager_->fetchJsonData(query);
+    QString url = QString("%1%2&startDate=%3&endDate=%4&type=json&aggregationTypes=last")
+                        .arg(API_END_POINT, SERIES_INFLATION, startDate, endDate);
+    http_manager_->fetchJsonData(url);
 }
 
 void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {

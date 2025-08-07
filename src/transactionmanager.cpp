@@ -109,22 +109,21 @@ void TransactionManager::processPotentialTransaction() {
 
 void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
                                     const QString &seriesCode) {
-    qDebug() << "EVDS data fetched for series:" << seriesCode;
+    // qDebug() << "EVDS data fetched for series:" << seriesCode;
     
-    // Thread-safe file writing with unique filename
-    static std::atomic<int> fileCounter{0};
-    QString filename = QString("fetched_data_%1_%2.json").arg(seriesCode).arg(fileCounter.fetch_add(1));
-    QFile file(filename);
+    // // Thread-safe file writing with unique filename
+    // static std::atomic<int> fileCounter{0};
+    // QString filename = QString("fetched_data_%1_%2.json").arg(seriesCode).arg(fileCounter.fetch_add(1));
+    // QFile file(filename);
 
-    if (file.open(QIODevice::WriteOnly)) {
-        QJsonDocument doc(*data);
-        file.write(doc.toJson());
-        file.close();
-    }
+    // if (file.open(QIODevice::WriteOnly)) {
+    //     QJsonDocument doc(*data);
+    //     file.write(doc.toJson());
+    //     file.close();
+    // }
 
     std::unique_lock<std::mutex> lock(m_mutex);
     
-    // Early return if no active transaction
     if (m_currentTransactionType == TransactionType::None) {
         qWarning() << "Received data with no active transaction";
         return;

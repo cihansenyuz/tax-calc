@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QDialog>
+#include <QTimer>
 #include "../inc/transaction.hpp"
+#include "../inc/network/yahoofinancefetcher.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dialog; }
@@ -27,4 +29,6 @@ private slots:
 
 private:
     Ui::Dialog *ui;
+    QTimer *searchTimer;
+    YahooFinanceFetcher *fetcher;
 };

@@ -1,7 +1,8 @@
-#pragma once
+ #pragma once
 
 #include <QDialog>
 #include <QTimer>
+#include <QCompleter>
 #include "../inc/transaction.hpp"
 #include "../inc/network/yahoofinancefetcher.hpp"
 
@@ -26,9 +27,12 @@ signals:
 
 private slots:
     void onOkClicked();
+    void onAssetSelected(const QString &selection);
 
 private:
     Ui::Dialog *ui;
     QTimer *searchTimer;
     YahooFinanceFetcher *fetcher;
+    QCompleter *nameCompleter;
+    QCompleter *symbolCompleter;
 };

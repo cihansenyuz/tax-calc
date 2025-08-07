@@ -1,6 +1,7 @@
 #include "createdialog.hpp"
 #include "ui_createdialog.h"
 #include <QMessageBox>
+#include <QStringListModel>
 
 CreateDialog::CreateDialog(QWidget *parent)
     : QDialog(parent), fetcher(new YahooFinanceFetcher(this)),
@@ -9,15 +10,28 @@ CreateDialog::CreateDialog(QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted,
             this, &CreateDialog::onOkClicked);
     
+    nameCompleter = new QCompleter(this);
+    nameCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    nameCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->nameLineEdit->setCompleter(nameCompleter);
+
+    connect(nameCompleter, QOverload<const QString &>::of(&QCompleter::activated),
+        this, [this](const QString &selection) {
+            QMetaObject::invokeMethod(this, "onAssetSelected", Qt::QueuedConnection, Q_ARG(QString, selection));
+        });
+
     connect(fetcher, &YahooFinanceFetcher::symbolsFetched,
             this, [this](const QList<QPair<QString, QString>> &symbols) {
+                QStringList assetList;
                 for (const auto &pair : symbols) {
-                    qDebug() << pair.first << " - " << pair.second;
+                    assetList << pair.first + " | " + pair.second;
                 }
+                nameCompleter->setModel(new QStringListModel(assetList, nameCompleter));
+                ui->nameLineEdit->completer()->complete();
     });
 
     searchTimer = new QTimer(this);
-    searchTimer->setInterval(750); // 750 ms delay for search
+    searchTimer->setInterval(600); // 600 ms delay for search
     connect(searchTimer, &QTimer::timeout, this, [this]() {
         QString query = ui->nameLineEdit->text();
         if (!query.isEmpty()) {
@@ -31,6 +45,15 @@ CreateDialog::CreateDialog(QWidget *parent)
             qDebug() << "Name field edited, restarting search timer.";
             searchTimer->start(); // Restarts the timer on each keystroke
     });
+}
+
+void CreateDialog::onAssetSelected(const QString &selection) {
+    QStringList parts = selection.split(" | ");
+    if (parts.size() == 2) {
+        ui->nameLineEdit->setText(parts[1]);
+        qDebug() << "Selected asset name:" << parts[1];
+        ui->symbolLineEdit->setText(parts[0]);
+    }
 }
 
 void CreateDialog::onOkClicked() {
@@ -55,7 +78,7 @@ void CreateDialog::onOkClicked() {
     accept();
 }
 
-CreateDialog::~CreateDialog(){ delete ui; delete fetcher; delete searchTimer; }
+CreateDialog::~CreateDialog(){ delete ui; delete fetcher; delete searchTimer; delete nameCompleter; }
 QString CreateDialog::symbol() const { return ui->symbolLineEdit->text(); }
 QString CreateDialog::name() const { return ui->nameLineEdit->text(); }
 double CreateDialog::buyPrice() const { return ui->buyPriceSpinBox->value(); }

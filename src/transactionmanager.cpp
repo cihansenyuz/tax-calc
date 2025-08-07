@@ -6,7 +6,7 @@
 
 TransactionManager::TransactionManager(QObject *parent)
     : QObject(parent) {
-    m_http_manager = new HttpManager();
+    m_http_manager = HttpManager::getInstance();
     m_http_manager->setKey(EvdsFetcher::API_KEY);
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &TransactionManager::onEvdsDataFetched);
@@ -21,7 +21,6 @@ TransactionManager::TransactionManager(QObject *parent)
 
 TransactionManager::~TransactionManager() {
     delete m_evds_fetcher;
-    delete m_http_manager;
 }
 
 void TransactionManager::openTransaction(const Transaction& transaction) {

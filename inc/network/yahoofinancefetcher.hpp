@@ -9,7 +9,7 @@
 class YahooFinanceFetcher : public QObject {
     Q_OBJECT
 public:
-    explicit YahooFinanceFetcher(HttpManager *http_manager, QObject *parent = nullptr);
+    explicit YahooFinanceFetcher(QObject *parent = nullptr);
     void fetchSymbols(const QString &query);
 
 signals:

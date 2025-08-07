@@ -6,8 +6,8 @@
 #include <QJsonArray>
 #include <QDebug>
 
-YahooFinanceFetcher::YahooFinanceFetcher(HttpManager *http_manager, QObject *parent)
-    : QObject(parent), http_manager_(http_manager) {
+YahooFinanceFetcher::YahooFinanceFetcher(QObject *parent)
+    : QObject(parent), http_manager_(HttpManager::getInstance()) {
     connect(http_manager_, &HttpManager::jsonFetched, this, &YahooFinanceFetcher::onJsonFetched);
 }
 

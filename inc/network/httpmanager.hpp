@@ -8,12 +8,20 @@
 
 class HttpManager : public GetRequest {
 public:
-    HttpManager() : GetRequest(this) {}
+    static HttpManager* getInstance() {
+        static HttpManager instance;
+        return &instance;
+    }
 
     void setKey(const QString &key) {
         this->key = key;
     }
-    
+
     QString token{TOKEN};
     QString key;
+
+private:
+    HttpManager() : GetRequest(this) {}
+    HttpManager(const HttpManager&) = delete;
+    HttpManager& operator=(const HttpManager&) = delete;
 };

@@ -147,6 +147,10 @@ void MainWindow::onFetchFailed(const QString &error) {
 
 void MainWindow::calculateTotalTaxBase(double potential) {
     double totalTaxBase = 0.0;
+    if(potential != 0.0)
+        ui->totalTaxBaseLabelText->setText("Toplam Kazancım\n(Potansiyel dahil)");
+    else
+        ui->totalTaxBaseLabelText->setText("Toplam Kazancım");
     
     for(const auto &transaction : m_asset_manager->getTransactions()) {
         if (transaction.getStatus() == Transaction::Status::Closed) {

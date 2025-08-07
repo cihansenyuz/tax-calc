@@ -10,12 +10,12 @@ CreateDialog::CreateDialog(QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted,
             this, &CreateDialog::onOkClicked);
     
-    nameCompleter = new QCompleter(this);
-    nameCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    nameCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    ui->nameLineEdit->setCompleter(nameCompleter);
+    symbolAndNameCompleter = new QCompleter(this);
+    symbolAndNameCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    symbolAndNameCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    ui->nameLineEdit->setCompleter(symbolAndNameCompleter);
 
-    connect(nameCompleter, QOverload<const QString &>::of(&QCompleter::activated),
+    connect(symbolAndNameCompleter, QOverload<const QString &>::of(&QCompleter::activated),
         this, [this](const QString &selection) {
             QMetaObject::invokeMethod(this, "onAssetSelected", Qt::QueuedConnection, Q_ARG(QString, selection));
         });
@@ -26,12 +26,12 @@ CreateDialog::CreateDialog(QWidget *parent)
                 for (const auto &pair : symbols) {
                     assetList << pair.first + " | " + pair.second;
                 }
-                nameCompleter->setModel(new QStringListModel(assetList, nameCompleter));
+                symbolAndNameCompleter->setModel(new QStringListModel(assetList, symbolAndNameCompleter));
                 ui->nameLineEdit->completer()->complete();
     });
 
     searchTimer = new QTimer(this);
-    searchTimer->setInterval(600); // 600 ms delay for search
+    searchTimer->setInterval(500); // 500 ms delay for search
     connect(searchTimer, &QTimer::timeout, this, [this]() {
         QString query = ui->nameLineEdit->text();
         if (!query.isEmpty()) {
@@ -78,7 +78,7 @@ void CreateDialog::onOkClicked() {
     accept();
 }
 
-CreateDialog::~CreateDialog(){ delete ui; delete fetcher; delete searchTimer; delete nameCompleter; }
+CreateDialog::~CreateDialog(){ delete ui; delete fetcher; delete searchTimer; delete symbolAndNameCompleter; }
 QString CreateDialog::symbol() const { return ui->symbolLineEdit->text(); }
 QString CreateDialog::name() const { return ui->nameLineEdit->text(); }
 double CreateDialog::buyPrice() const { return ui->buyPriceSpinBox->value(); }

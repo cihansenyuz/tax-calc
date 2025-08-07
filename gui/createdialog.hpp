@@ -33,6 +33,5 @@ private:
     Ui::Dialog *ui;
     QTimer *searchTimer;
     YahooFinanceFetcher *fetcher;
-    QCompleter *nameCompleter;
-    QCompleter *symbolCompleter;
+    QCompleter *symbolAndNameCompleter;
 };

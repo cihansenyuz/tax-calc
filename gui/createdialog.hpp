@@ -1,5 +1,6 @@
- #pragma once
+#pragma once
 
+#include <memory>
 #include <QDialog>
 #include <QTimer>
 #include <QCompleter>
@@ -31,7 +32,7 @@ private slots:
 
 private:
     Ui::Dialog *ui;
-    QTimer *searchTimer;
-    YahooFinanceFetcher *fetcher;
-    QCompleter *symbolAndNameCompleter;
+    std::unique_ptr<QTimer> m_searchTimer;
+    std::unique_ptr<YahooFinanceFetcher> m_fetcher;
+    std::unique_ptr<QCompleter> m_symbolAndNameCompleter;
 };

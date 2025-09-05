@@ -12,6 +12,9 @@ public:
     setHorizontalHeaderLabels(m_labels);
     setMinimumSize(800, 400);
     resizeColumnsToContents();
+
+    setSelectionMode(QAbstractItemView::MultiSelection);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
     void refresh(const std::vector<Transaction> &transactions) {

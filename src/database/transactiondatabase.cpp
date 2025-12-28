@@ -38,7 +38,7 @@ bool TransactionDatabase::initAssetTable() {
         "symbolName TEXT,"
         "buyDate TEXT,"
         "buyPrice REAL,"
-        "quantity INTEGER,"
+        "quantity REAL,"
         "sellDate TEXT,"
         "sellPrice REAL,"
         "status TEXT,"
@@ -143,7 +143,7 @@ std::vector<Transaction> TransactionDatabase::getAssetsFromDB()
             query.value(2).toString().toStdString(), // symbolName
             QDate::fromString(query.value(3).toString(), "dd-MM-yyyy"), // buyDate
             query.value(4).toDouble(), // buyPrice
-            query.value(5).toInt(), // quantity
+            query.value(5).toDouble(), // quantity
             QDate::fromString(query.value(6).toString(), "dd-MM-yyyy"), // sellDate
             query.value(7).toDouble(), // sellPrice
             Transaction::stringToStatus(query.value(8).toString()), // status

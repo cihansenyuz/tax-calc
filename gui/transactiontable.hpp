@@ -72,7 +72,7 @@ public:
         item = new QTableWidgetItem(QString::fromStdString(transaction.getSymbolName()));
         setItem(currentRow, 2, item);
 
-        item = new QTableWidgetItem(QString::number(transaction.getQuantity()));
+        item = new QTableWidgetItem(QString::number(transaction.getQuantity(), 'g', 15));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 3, item);
 

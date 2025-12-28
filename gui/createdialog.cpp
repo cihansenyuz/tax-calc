@@ -64,7 +64,7 @@ void CreateDialog::onOkClicked() {
     QString nameStr = name();
     double price = buyPrice();
     QDate date = buyDate();
-    int quantity = ui->quantitySpinBox->value();
+    double quantity = ui->quantitySpinBox->value();
 
     if (symbolStr.isEmpty() || nameStr.isEmpty() || price <= 0 || quantity <= 0) {
         QMessageBox::warning(this, "Giriş Hatası", "Lütfen tüm alanları doğru şekilde doldurun.");

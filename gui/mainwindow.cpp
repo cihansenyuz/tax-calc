@@ -380,7 +380,7 @@ void MainWindow::onSelectButtonClicked() {
         Transaction selectedTransaction = transaction_manager->findTransactionById(idStr.toInt());
         m_selectedTransactions.push_back(selectedTransaction);
         symbols    << QString::fromStdString(selectedTransaction.getSymbol());
-        quantities << QString::number(selectedTransaction.getQuantity());
+        quantities << QString::number(selectedTransaction.getQuantity(), 'g', 15);
         idStrings  << QString::number(selectedTransaction.getId());
     }
 

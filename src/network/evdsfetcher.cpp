@@ -33,7 +33,7 @@ void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {
             // Special condition: totalCount == 0 and items is empty
             // Occurs when last month's inflation index has not been published yet
             if (data->value("totalCount").toInt() == 0 && items.isEmpty()) {
-                emit fetchFailed("Henüz yayımlanmayan veri var.\nLütfen bir kaç gün sonra tekrar deneyin.");
+                emit fetchFailed("Henüz EVDS tarafından yayımlanmayan veri var.\nLütfen bir kaç gün sonra tekrar deneyin.");
                 return;
             }
 

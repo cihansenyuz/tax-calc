@@ -1,15 +1,16 @@
 #include "../../inc/network/getrequest.hpp"
 #include "../../inc/network/httpmanager.hpp"
+#include "../../inc/logger.hpp"
 
 GetRequest::GetRequest(HttpManager *parent)
     : parent_(parent) {}
 
 void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
-    qDebug() << "#### on fetch(get) reply ####";
+    qDebug(logNetwork) << "#### on fetch(get) reply ####";
     
     if (!reply) {
-        qDebug() << "Error: Reply is null";
-        qDebug() << "#########################################\n";
+        qDebug(logNetwork) << "Error: Reply is null";
+        qDebug(logNetwork) << "#########################################\n";
         return;
     }
     
@@ -22,18 +23,18 @@ void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
         if(statusCode == 200){
             fetched_data = std::make_shared<QJsonObject>(replyDocument.object());
             emit jsonFetched(fetched_data);
-            qDebug() << "json data fetched successfully";
+            qInfo(logNetwork) << "json data fetched successfully";
         }
         else if(statusCode == 401 || statusCode == 403)
-            qDebug() << "fetch failed, unauthorized attempt";
+            qWarning(logNetwork) << "fetch failed, unauthorized attempt";
         else if(replyDocument.isNull())
-            qDebug() << "JSON array is null";
+            qWarning(logNetwork) << "JSON array is null";
         else if(!replyDocument.isArray())
-            qDebug() << "JSON is not an array.";
+            qWarning(logNetwork) << "JSON is not an array.";
     }
     else
-        qDebug() << "fetch error: " << reply->error();
-    qDebug() << "#########################################\n";
+        qWarning(logNetwork) << "fetch error: " << reply->error();
+    qDebug(logNetwork) << "#########################################\n";
 }
 
 void GetRequest::fetchJsonData(const QString &api_query) {
@@ -41,6 +42,6 @@ void GetRequest::fetchJsonData(const QString &api_query) {
 }
 
 QNetworkReply* GetRequest::getHttpReply(const QNetworkRequest &request) {
-    qDebug() << "get request done";
+    qInfo(logNetwork) << "get request done";
     return http_access_manager.get(request);
 }

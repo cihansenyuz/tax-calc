@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../logger.hpp"
 #include <QObject>
 #include <QtNetwork>
 
@@ -21,12 +22,12 @@ public:
         if(key.size())
             http_request.setRawHeader("key", key.toUtf8());
 
-        qDebug() << "#### on http request, http headers ####";
+        qDebug(logNetwork) << "#### on http request, http headers ####";
         QList<QByteArray> headerList = http_request.rawHeaderList();
         for (const QByteArray &header : headerList) {
-            qDebug() << header << ": " << http_request.rawHeader(header);
+            qDebug(logNetwork) << header << ": " << http_request.rawHeader(header);
         }
-        qDebug() << "#########################################";
+        qDebug(logNetwork) << "#########################################";
 
         QNetworkReply* reply = getHttpReply(http_request);
         

@@ -13,6 +13,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets Network Sql)
 
 set(PROJECT_SOURCES
         src/main.cpp
+        src/logger.cpp
 
         src/network/networkcore.cpp
         src/network/getrequest.cpp
@@ -21,6 +22,7 @@ set(PROJECT_SOURCES
         src/database/transactiondatabase.cpp
         src/transactionmanager.cpp
 
+        inc/logger.hpp
         inc/network/networkcore.hpp
         inc/network/getrequest.hpp
         inc/network/httpmanager.hpp

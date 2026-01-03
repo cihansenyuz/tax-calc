@@ -10,6 +10,13 @@ A desktop application to help Turkish citizens calculate income tax on foreign s
 - Displays all positions in a sortable table
 - Summarizes yearly tax base
 - Modern Qt6 GUI
+- Comprehensive logging system with file and console output
+
+## Logging
+
+The application includes an integrated Qt-native logger that captures all application events. Logs are written to `tax_calc.log` in the application directory with timestamps, severity levels, and component categories.
+
+See [LOGGER_USAGE.md](LOGGER_USAGE.md) for detailed logging documentation.
 
 ## Build & Run
 

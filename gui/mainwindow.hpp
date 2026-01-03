@@ -31,7 +31,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::unique_ptr<CreateDialog> m_create_dialog;
-    TransactionManager *m_asset_manager;
+    TransactionManager *transaction_manager;
     TransactionTable m_table{this};
 
     void calculateTotalTaxBase(double potential = 0.0);

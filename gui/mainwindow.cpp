@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     QString version = QCoreApplication::applicationVersion();
     setWindowTitle(QString("%1 v%2").arg(appName, version));
 
-    m_asset_manager = new TransactionManager(this);
+    transaction_manager = new TransactionManager(this);
     connect(ui->createButton, &QPushButton::clicked,
             this, &MainWindow::onCreateButtonClicked);
     connect(ui->closeTransactionButton, &QPushButton::clicked,
@@ -19,17 +19,17 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onDeletePositionButtonClicked);
     connect(ui->calculatePotentialTaxButton, &QPushButton::clicked,
             this, &MainWindow::onPotentialCalculateButtonClicked);
-    connect(m_asset_manager, &TransactionManager::databaseReady,
+    connect(transaction_manager, &TransactionManager::databaseReady,
             this, &MainWindow::onDatabaseReady);
     connect(ui->cleanSelectionButton, &QPushButton::clicked,
             this, &MainWindow::onCleanSelectionButtonClicked);
-    connect(m_asset_manager, &TransactionManager::fetchFailed,
+    connect(transaction_manager, &TransactionManager::fetchFailed,
             this, &MainWindow::onFetchFailed);
     connect(ui->selectButton, &QPushButton::clicked,
             this, &MainWindow::onSelectButtonClicked);
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
-    m_table.refresh(m_asset_manager->getTransactions());
+    m_table.refresh(transaction_manager->getTransactions());
     
     ui->sellDateEdit->setDate(QDate::currentDate());
     ui->taxRangesComboBox->addItem("15%", 0.15);
@@ -49,13 +49,13 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
-    delete m_asset_manager;
+    delete transaction_manager;
     delete ui;
 }
 
 void MainWindow::onDatabaseReady() {
     // qDebug() << "Database is ready, refreshing table.";
-    m_table.refresh(m_asset_manager->getTransactions());
+    m_table.refresh(transaction_manager->getTransactions());
     calculateTotalTaxBase();
 }
 
@@ -69,7 +69,7 @@ void MainWindow::onCreateButtonClicked() {
     if (!m_create_dialog) {
         m_create_dialog = std::make_unique<CreateDialog>(this);
         connect(m_create_dialog.get(), &CreateDialog::assetCreated,
-                m_asset_manager, &TransactionManager::openTransaction, Qt::SingleShotConnection);
+                transaction_manager, &TransactionManager::openTransaction, Qt::SingleShotConnection);
 
         m_create_dialog->exec();
         m_create_dialog.reset();
@@ -85,7 +85,7 @@ void MainWindow::onDeletePositionButtonClicked() {
     int id = ui->IDlabel->text().toInt();
                 
     try{
-        m_asset_manager->removeTransaction(id);
+        transaction_manager->removeTransaction(id);
     } catch (const std::runtime_error& e) {
         QMessageBox::warning(this, "Pozisyon Sil", e.what());
         return;
@@ -99,7 +99,7 @@ void MainWindow::onCloseTransactionButtonClicked() {
         return;
     }
 
-    Transaction selectedTransaction = m_asset_manager->findTransactionById(ui->IDlabel->text().toInt());
+    Transaction selectedTransaction = transaction_manager->findTransactionById(ui->IDlabel->text().toInt());
     double sellPrice = ui->sellPriceSpinBox->value();
     QDate sellDate = ui->sellDateEdit->date();
 
@@ -112,7 +112,7 @@ void MainWindow::onCloseTransactionButtonClicked() {
     selectedTransaction.setSellPrice(sellPrice);
     selectedTransaction.setStatus(Transaction::Status::Closed);
 
-    m_asset_manager->closeTransaction(selectedTransaction);
+    transaction_manager->closeTransaction(selectedTransaction);
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {
@@ -121,7 +121,7 @@ void MainWindow::onPotentialCalculateButtonClicked() {
         return;
     }
 
-    Transaction selectedTransaction = m_asset_manager->findTransactionById(ui->IDlabel->text().toInt());
+    Transaction selectedTransaction = transaction_manager->findTransactionById(ui->IDlabel->text().toInt());
     double potentialSellPrice = ui->potentialSellPriceSpinBox->value();
     QDate currentDate = QDate::currentDate();
 
@@ -133,12 +133,12 @@ void MainWindow::onPotentialCalculateButtonClicked() {
     selectedTransaction.setSellDate(currentDate);
     selectedTransaction.setSellPrice(potentialSellPrice);
 
-    connect(m_asset_manager, &TransactionManager::potentialTaxBaseReady,
+    connect(transaction_manager, &TransactionManager::potentialTaxBaseReady,
             this, [this](double potentialTaxBase) {
                 ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2) + " ₺");
                 calculateTotalTaxBase(potentialTaxBase);
             }, Qt::SingleShotConnection);
-    m_asset_manager->potentialTransaction(selectedTransaction);
+    transaction_manager->potentialTransaction(selectedTransaction);
 }
 
 void MainWindow::onFetchFailed(const QString &error) {
@@ -152,7 +152,7 @@ void MainWindow::calculateTotalTaxBase(double potential) {
     else
         ui->totalTaxBaseLabelText->setText("Toplam Kazancım");
     
-    for(const auto &transaction : m_asset_manager->getTransactions()) {
+    for(const auto &transaction : transaction_manager->getTransactions()) {
         if (transaction.getStatus() == Transaction::Status::Closed) {
             QDate sellDate = transaction.getSellQDate();
             
@@ -182,7 +182,7 @@ void MainWindow::onSelectButtonClicked() {
         QMessageBox::warning(this, "Seçim Hatası", "Geçerli bir işlem seçilmedi.");
         return;
     }
-    Transaction selectedTransaction = m_asset_manager->findTransactionById(item->text().toInt());
+    Transaction selectedTransaction = transaction_manager->findTransactionById(item->text().toInt());
     ui->symbolLabel->setText(QString::fromStdString(selectedTransaction.getSymbol()));
     ui->quantityLabel->setText(QString::number(selectedTransaction.getQuantity()));
     ui->IDlabel->setText(QString::number(selectedTransaction.getId()));

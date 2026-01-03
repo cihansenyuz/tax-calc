@@ -42,5 +42,5 @@ void GetRequest::fetchJsonData(const QString &api_query) {
 
 QNetworkReply* GetRequest::getHttpReply(const QNetworkRequest &request) {
     qDebug() << "get request done";
-    return http_access_manager.get(request, http_body_data.toJson());
+    return http_access_manager.get(request);
 }

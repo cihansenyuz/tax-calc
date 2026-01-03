@@ -16,6 +16,13 @@ A desktop application to help Turkish citizens calculate income tax on foreign s
 
 The application includes an integrated Qt-native logger that captures all application events. Logs are written to `tax_calc.log` in the application directory with timestamps, severity levels, and component categories.
 
+**Default log level**: INFO (shows informational messages, warnings, and errors)
+
+**Debug mode**: Run with `--debug` or `-d` flag to enable detailed debug logging:
+```sh
+./build/tax_calc --debug
+```
+
 See [LOGGER_USAGE.md](LOGGER_USAGE.md) for detailed logging documentation.
 
 ## Build & Run
@@ -38,7 +45,14 @@ cmake --build build
 ### Run
 
 ```sh
+# Run normally (INFO log level)
 ./build/tax_calc
+
+# Run with debug logging enabled
+./build/tax_calc --debug
+
+# Show help and available options
+./build/tax_calc --help
 ```
 
 ## Usage

@@ -2,7 +2,7 @@
 #include "../inc/network/evdsfetcher.hpp"
 #include "../inc/network/httpmanager.hpp"
 #include "../inc/calculator.hpp"
-#include <QDebug>
+#include "../inc/logger.hpp"
 
 TransactionManager::TransactionManager(QObject *parent)
     : QObject(parent) {
@@ -109,7 +109,7 @@ void TransactionManager::processPotentialTransaction() {
 
 void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &data,
                                     const QString &seriesCode) {
-    // qDebug() << "EVDS data fetched for series:" << seriesCode;
+    qDebug(logManager) << "EVDS data fetched for series:" << seriesCode;
     
     // // Thread-safe file writing with unique filename
     // static std::atomic<int> fileCounter{0};
@@ -125,7 +125,7 @@ void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &d
     std::unique_lock<std::mutex> lock(m_mutex);
     
     if (m_currentTransactionType == TransactionType::None) {
-        qWarning() << "Received data with no active transaction";
+        qWarning(logManager) << "Received data with no active transaction";
         return;
     }
     
@@ -148,7 +148,7 @@ void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &d
                     if (value > 0.0) {
                         m_data_to_be_updated.first = value;
                         m_exchangeRateReceived = true;
-                        qDebug() << "Exchange rate received:" << value;
+                        qInfo(logManager) << "Exchange rate received:" << value;
                         break;
                     }
                 }
@@ -163,7 +163,7 @@ void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &d
                     if (value > 0.0) {
                         m_data_to_be_updated.second = value;
                         m_inflationIndexReceived = true;
-                        qDebug() << "Inflation index received:" << value;
+                        qInfo(logManager) << "Inflation index received:" << value;
                         break;
                     }
                 }
@@ -172,7 +172,7 @@ void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &d
     }
     
     if (m_exchangeRateReceived && m_inflationIndexReceived) {
-        qDebug() << "Both values received, processing transaction";
+        qDebug(logManager) << "Both values received, processing transaction";
         
         TransactionType currentType = m_currentTransactionType;
         
@@ -193,7 +193,7 @@ void TransactionManager::onEvdsDataFetched(const std::shared_ptr<QJsonObject> &d
                 break;
             case TransactionType::None:
                 // This shouldn't happen due to early return above
-                qWarning() << "Unexpected transaction state during processing";
+                qWarning(logManager) << "Unexpected transaction state during processing";
                 break;
         }
     }
@@ -206,6 +206,7 @@ Transaction TransactionManager::findTransactionById(int id) {
             return transaction;
         }
     }
+    qDebug(logManager) << "Transaction with ID" << id << "not found.";
     throw std::runtime_error{"Asset with ID " + std::to_string(id) + " not found."};
 }
 
@@ -232,5 +233,6 @@ void TransactionManager::onFetchFailed(const QString &error) {
     m_inflationIndexReceived = false;
     m_data_to_be_updated = {0.0, 0.0};
     
+    qWarning(logManager) << "Data fetch failed:" << error;
     emit fetchFailed(error);
 }

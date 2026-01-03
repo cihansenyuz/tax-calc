@@ -1,9 +1,9 @@
 #include "../../inc/database/transactiondatabase.hpp"
 #include "../../inc/transaction.hpp"
+#include "../../inc/logger.hpp"
 
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QDebug>
 #include <QString>
 
 TransactionDatabase& TransactionDatabase::getInstance(const QString& dbPath) {
@@ -15,7 +15,7 @@ TransactionDatabase::TransactionDatabase(const QString& dbPath) {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(dbPath);
     if (!m_db.open()) {
-        qWarning() << "Failed to open database:" << m_db.lastError().text();
+        qCritical(logDatabase) << "Failed to open database:" << m_db.lastError().text();
     }
 }
 
@@ -50,7 +50,7 @@ bool TransactionDatabase::initAssetTable() {
         "taxBase REAL"
         ");";
     if (!query.exec(createTable)) {
-        qWarning() << "Failed to create assets table:" << query.lastError().text();
+        qCritical(logDatabase) << "Failed to create assets table:" << query.lastError().text();
         return false;
     }
     return true;
@@ -79,7 +79,7 @@ bool TransactionDatabase::saveAsset(const Transaction& transaction) {
     query.addBindValue(transaction.getTax());
     query.addBindValue(transaction.getTaxBase());
     if (!query.exec()) {
-        qWarning() << "Failed to insert asset:" << query.lastError().text();
+        qCritical(logDatabase) << "Failed to insert asset:" << query.lastError().text();
         return false;
     }
     return true;
@@ -118,7 +118,7 @@ bool TransactionDatabase::deleteAsset(int id) {
     query.addBindValue(id);
 
     if (!query.exec()) {
-        qWarning() << "Failed to delete asset:" << query.lastError().text();
+        qCritical(logDatabase) << "Failed to delete asset:" << query.lastError().text();
         return false;
     }
 
@@ -127,12 +127,12 @@ bool TransactionDatabase::deleteAsset(int id) {
 
 std::vector<Transaction> TransactionDatabase::getAssetsFromDB()
 {
-    qDebug() << "Loading assets from database...";
+    qDebug(logDatabase) << "Loading assets from database...";
     std::vector<Transaction> assets;
     QSqlQuery query(m_db);
 
     if (!query.exec("SELECT id, symbol, symbolName, buyDate, buyPrice, quantity, sellDate, sellPrice, status, inflationIndexAtBuy, exchangeRateAtBuy, inflationIndexAtSell, exchangeRateAtSell, tax, taxBase FROM assets")) {
-        qWarning() << "Failed to load assets:" << query.lastError().text();
+        qCritical(logDatabase) << "Failed to load assets:" << query.lastError().text();
         return assets;
     }
 
@@ -176,7 +176,7 @@ std::vector<Transaction> TransactionDatabase::getAssetsFromDB()
         
         assets.push_back(asset);
     }
-    qDebug() << "Successfully loaded" << assets.size() << "assets from database.";
+    qInfo(logDatabase) << "Successfully loaded" << assets.size() << "assets from database.";
     
     return assets;
 }

@@ -18,7 +18,7 @@ public:
     bool updateAsset(const Transaction& transaction);
     bool deleteAsset(int id);
     
-    std::vector<Transaction> loadAssets();
+    std::vector<Transaction> getAssetsFromDB();
 
 private:
     TransactionDatabase(const QString& dbPath);

@@ -16,7 +16,7 @@ TransactionManager::TransactionManager(QObject *parent)
     if(!m_asset_db->initAssetTable())
         throw std::runtime_error("Failed to initialize asset database table");
 
-    m_transactions = m_asset_db->loadAssets();
+    m_transactions = m_asset_db->getAssetsFromDB();
 }
 
 TransactionManager::~TransactionManager() {

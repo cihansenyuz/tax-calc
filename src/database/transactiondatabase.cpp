@@ -125,7 +125,7 @@ bool TransactionDatabase::deleteAsset(int id) {
     return true;
 }
 
-std::vector<Transaction> TransactionDatabase::loadAssets()
+std::vector<Transaction> TransactionDatabase::getAssetsFromDB()
 {
     qDebug() << "Loading assets from database...";
     std::vector<Transaction> assets;

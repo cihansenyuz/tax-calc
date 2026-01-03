@@ -1,6 +1,7 @@
 #pragma once
 
 #include "transaction.hpp"
+#include "logger.hpp"
 
 class Calculator {
 public:
@@ -28,7 +29,7 @@ public:
             return taxBase < 0 ? 0.0 : taxBase;
         }
         catch (const std::exception& e) {
-            qDebug() << "Error calculating tax base: " << e.what();
+            qWarning(logCalculator) << "Error calculating tax base: " << e.what();
             return 0.0;
         }
     }

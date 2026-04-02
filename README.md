@@ -65,5 +65,5 @@ cmake --build build
 
 ## Data Sources
 
-- TCMB EVDS API: https://evds2.tcmb.gov.tr/  
+- TCMB EVDS API: https://evds3.tcmb.gov.tr/  
 USD Exchange Rate: TP.DK.USD.A, Inflation Index: TP.TUFE1YI.T1

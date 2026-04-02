@@ -14,7 +14,7 @@ public:
     void fetchExchangeRate(QDate date);
     void fetchInflationIndex(QDate date);
 
-    static constexpr const char* API_END_POINT = "https://evds3.tcmb.gov.tr/igmevdsms-dis/serieList/type=";
+    static constexpr const char* API_END_POINT = "https://evds3.tcmb.gov.tr/igmevdsms-dis/series=";
     static constexpr const char* SERIES_USD = "TP.DK.USD.A";
     static constexpr const char* SERIES_INFLATION = "TP.TUFE1YI.T1";
     static constexpr const char* API_KEY = "HSzat3MFdF";

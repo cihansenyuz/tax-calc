@@ -26,6 +26,7 @@ signals:
 
 private slots:
     void onJsonFetched(const std::shared_ptr<QJsonObject> &data);
+    void onJsonFetchFailed(const QString &error);
 
 private:
     HttpManager *http_manager_;

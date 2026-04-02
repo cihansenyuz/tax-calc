@@ -10,6 +10,7 @@ public:
 
 signals:
     void jsonFetched(const std::shared_ptr<QJsonObject> &fetched_data);
+    void jsonFetchFailed(const QString &error_message);
 
 private slots:
     void onFetchJsonDataReplyReceived(QNetworkReply* reply);

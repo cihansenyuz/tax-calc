@@ -10,6 +10,7 @@
 EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)
     : QObject(parent), http_manager_(http_manager) {
     connect(http_manager_, &HttpManager::jsonFetched, this, &EvdsFetcher::onJsonFetched);
+    connect(http_manager_, &HttpManager::jsonFetchFailed, this, &EvdsFetcher::onJsonFetchFailed);
 }
 
 void EvdsFetcher::fetchExchangeRate(QDate date) {
@@ -103,4 +104,9 @@ void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {
         qWarning(logNetwork) << "EvdsFetcher: Received null JSON data";
         emit fetchFailed("TCMB sunucusundan veri alınamadı,\nDaha sonra tekrar deneyin.");
     }
+}
+
+void EvdsFetcher::onJsonFetchFailed(const QString &error) {
+    qWarning(logNetwork) << "EvdsFetcher: JSON fetch failed:" << error;
+    emit fetchFailed(error);
 }

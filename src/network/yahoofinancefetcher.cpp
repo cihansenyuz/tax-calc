@@ -9,6 +9,7 @@
 YahooFinanceFetcher::YahooFinanceFetcher(QObject *parent)
     : QObject(parent), http_manager_(HttpManager::getInstance()) {
     connect(http_manager_, &HttpManager::jsonFetched, this, &YahooFinanceFetcher::onJsonFetched);
+    connect(http_manager_, &HttpManager::jsonFetchFailed, this, &YahooFinanceFetcher::onJsonFetchFailed);
 }
 
 void YahooFinanceFetcher::fetchSymbols(const QString &query) {
@@ -43,4 +44,9 @@ void YahooFinanceFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &json
 
     qInfo(logNetwork) << "YahooFinanceFetcher: Emitting symbols";
     emit symbolsFetched(results);
+}
+
+void YahooFinanceFetcher::onJsonFetchFailed(const QString &error) {
+    qWarning(logNetwork) << "YahooFinanceFetcher: JSON fetch failed:" << error;
+    emit fetchFailed(error);
 }

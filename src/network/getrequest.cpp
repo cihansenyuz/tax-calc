@@ -10,6 +10,7 @@ void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
     
     if (!reply) {
         qDebug(logNetwork) << "Error: Reply is null";
+        emit jsonFetchFailed("Reply is null");
         qDebug(logNetwork) << "#########################################\n";
         return;
     }
@@ -25,15 +26,23 @@ void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
             emit jsonFetched(fetched_data);
             qInfo(logNetwork) << "json data fetched successfully";
         }
-        else if(statusCode == 401 || statusCode == 403)
+        else if(statusCode == 401 || statusCode == 403) {
             qWarning(logNetwork) << "fetch failed, unauthorized attempt";
-        else if(replyDocument.isNull())
+            emit jsonFetchFailed(QString("Unauthorized: HTTP %1").arg(statusCode));
+        }
+        else if(replyDocument.isNull()) {
             qWarning(logNetwork) << "JSON array is null";
-        else if(!replyDocument.isArray())
+            emit jsonFetchFailed("JSON document is null");
+        }
+        else if(!replyDocument.isArray()) {
             qWarning(logNetwork) << "JSON is not an array.";
+            emit jsonFetchFailed("JSON is not an array");
+        }
     }
-    else
+    else {
         qWarning(logNetwork) << "fetch error: " << reply->error();
+        emit jsonFetchFailed(QString("Network error: %1").arg(reply->errorString()));
+    }
     qDebug(logNetwork) << "#########################################\n";
 }
 

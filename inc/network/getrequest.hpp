@@ -9,7 +9,7 @@ public:
     void fetchJsonData(const QString &api_query);
 
 signals:
-    void jsonFetched(const std::shared_ptr<QJsonObject> &fetched_data);
+    void jsonFetched(const std::shared_ptr<QJsonObject> &fetched_data, const QString &requestUrl);
     void jsonFetchFailed(const QString &error_message);
 
 private slots:

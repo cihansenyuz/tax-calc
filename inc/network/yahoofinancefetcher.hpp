@@ -17,7 +17,7 @@ signals:
     void fetchFailed(const QString &error);
 
 private slots:
-    void onJsonFetched(const std::shared_ptr<QJsonObject> &json);
+    void onJsonFetched(const std::shared_ptr<QJsonObject> &json, const QString &url);
     void onJsonFetchFailed(const QString &error);
     
 private:
@@ -25,4 +25,5 @@ private:
     static constexpr const char* apiEndPoint = "https://query1.finance.yahoo.com/v1/finance/search";
     static constexpr const char* quotesField = "quotesCount=10";
     static constexpr const char* newsCountField = "newsCount=0";
+    static constexpr const char* REQUESTER_FILTER = "query1.finance.yahoo.com";
 };

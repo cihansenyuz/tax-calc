@@ -30,7 +30,13 @@ void EvdsFetcher::fetchInflationIndex(QDate date) {
     http_manager_->fetchJsonData(url);
 }
 
-void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {
+void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data, const QString &url) {
+    // Only process EVDS responses
+    if (!url.contains(REQUESTER_FILTER)) {
+        qDebug(logNetwork) << "EvdsFetcher: Ignoring non-EVDS response from" << url;
+        return;
+    }
+    
     if (data) {
         // Save received JSON data to a local file when debug mode is enabled
         if (logNetwork().isDebugEnabled()) {

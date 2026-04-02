@@ -19,7 +19,12 @@ void YahooFinanceFetcher::fetchSymbols(const QString &query) {
     http_manager_->fetchJsonData(url);
 }
 
-void YahooFinanceFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &json) {
+void YahooFinanceFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &json, const QString &url) {
+    if (!url.contains(REQUESTER_FILTER)) {
+        qDebug(logNetwork) << "YahooFinanceFetcher: Ignoring non-Yahoo Finance response from" << url;
+        return;
+    }
+    
     if (!json) {
         qWarning(logNetwork) << "YahooFinanceFetcher: Received null JSON data";
         emit fetchFailed("Yahoo Finance sunucusundan veri alınamadı,\nDaha sonra tekrar deneyin.");

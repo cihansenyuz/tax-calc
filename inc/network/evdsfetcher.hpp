@@ -18,6 +18,7 @@ public:
     static constexpr const char* SERIES_USD = "TP.DK.USD.A";
     static constexpr const char* SERIES_INFLATION = "TP.TUFE1YI.T1";
     static constexpr const char* API_KEY = "HSzat3MFdF";
+    static constexpr const char* REQUESTER_FILTER = "evds3.tcmb.gov.tr";
 
 signals:
     void evdsDataFetched(const std::shared_ptr<QJsonObject> &data,
@@ -25,7 +26,7 @@ signals:
     void fetchFailed(const QString &error);
 
 private slots:
-    void onJsonFetched(const std::shared_ptr<QJsonObject> &data);
+    void onJsonFetched(const std::shared_ptr<QJsonObject> &data, const QString &url);
     void onJsonFetchFailed(const QString &error);
 
 private:

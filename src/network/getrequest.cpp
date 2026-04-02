@@ -15,6 +15,8 @@ void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
         return;
     }
     
+    QString requestUrl = reply->url().toString();
+    
     if(reply->error() == QNetworkReply::NoError){
         QByteArray replyData = reply->readAll();
         QJsonDocument replyDocument = QJsonDocument::fromJson(replyData.data());
@@ -23,7 +25,7 @@ void GetRequest::onFetchJsonDataReplyReceived(QNetworkReply* reply) {
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         if(statusCode == 200){
             fetched_data = std::make_shared<QJsonObject>(replyDocument.object());
-            emit jsonFetched(fetched_data);
+            emit jsonFetched(fetched_data, requestUrl);
             qInfo(logNetwork) << "json data fetched successfully";
         }
         else if(statusCode == 401 || statusCode == 403) {

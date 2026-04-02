@@ -1,5 +1,11 @@
 #include "../../inc/network/evdsfetcher.hpp"
 #include "../../inc/logger.hpp"
+#include <QFile>
+#include <QTextStream>
+#include <QStandardPaths>
+#include <QDir>
+#include <QJsonDocument>
+#include <QDateTime>
 
 EvdsFetcher::EvdsFetcher(HttpManager *http_manager, QObject *parent)
     : QObject(parent), http_manager_(http_manager) {
@@ -25,6 +31,31 @@ void EvdsFetcher::fetchInflationIndex(QDate date) {
 
 void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {
     if (data) {
+        // Save received JSON data to a local file when debug mode is enabled
+        if (logNetwork().isDebugEnabled()) {
+            QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QDir dir;
+            if (!dir.exists(dataDir)) {
+                dir.mkpath(dataDir);
+            }
+            
+            QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+            QString filePath = dataDir + QString("/evds_response_%1.txt").arg(timestamp);
+            
+            QFile file(filePath);
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QTextStream out(&file);
+                QJsonDocument doc(*data);
+                out << "EVDS API Response - " << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << "\n";
+                out << "=" << QString(60, '=') << "\n\n";
+                out << doc.toJson(QJsonDocument::Indented);
+                file.close();
+                qDebug(logNetwork) << "EvdsFetcher: Saved response to" << filePath;
+            } else {
+                qWarning(logNetwork) << "EvdsFetcher: Failed to save response to file:" << filePath;
+            }
+        }
+        
         QString seriesCode;
 
         if (data->contains("items")) {
@@ -57,6 +88,12 @@ void EvdsFetcher::onJsonFetched(const std::shared_ptr<QJsonObject> &data) {
                     break;
                 }
             }
+        }
+        else {
+            qWarning(logNetwork) << "EvdsFetcher: JSON data does not contain 'items' array";
+            emit fetchFailed("TCMB sunucusundan beklenmeyen veri formatı alındı.");
+
+            return;
         }
 
         qInfo(logNetwork) << "EvdsFetcher: Emitting series code:" << seriesCode;

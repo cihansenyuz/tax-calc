@@ -1,7 +1,26 @@
 #pragma once
 
 #include <QTableWidget>
+#include <QDate>
 #include "../inc/transaction.hpp"
+
+// Custom item class that sorts dates correctly
+class DateTableWidgetItem : public QTableWidgetItem {
+public:
+    explicit DateTableWidgetItem(const QString& dateStr, const QDate& date)
+        : QTableWidgetItem(dateStr), m_date(date) {}
+    
+    bool operator<(const QTableWidgetItem& other) const override {
+        const DateTableWidgetItem* dateItem = dynamic_cast<const DateTableWidgetItem*>(&other);
+        if (dateItem) {
+            return m_date < dateItem->m_date;
+        }
+        return QTableWidgetItem::operator<(other);
+    }
+
+private:
+    QDate m_date;
+};
 
 class TransactionTable : public QTableWidget {
 public:
@@ -12,9 +31,12 @@ public:
     setHorizontalHeaderLabels(m_labels);
     setMinimumSize(800, 400);
     resizeColumnsToContents();
+    setSortingEnabled(true);
 }
 
     void refresh(const std::vector<Transaction> &transactions) {
+        setSortingEnabled(false);  // Disable during refresh
+        
         clearContents();
         setRowCount(0);
 
@@ -38,7 +60,7 @@ public:
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 3, item);
 
-        item = new QTableWidgetItem(transaction.getBuyDate());
+        item = new DateTableWidgetItem(transaction.getBuyDate(), transaction.getBuyQDate());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 4, item);
 
@@ -46,7 +68,7 @@ public:
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 5, item);
 
-        item = new QTableWidgetItem(transaction.getSellDate());
+        item = new DateTableWidgetItem(transaction.getSellDate(), transaction.getSellQDate());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 6, item);
 
@@ -64,6 +86,7 @@ public:
         }
 
         resizeColumnsToContents();
+        setSortingEnabled(true);  // Re-enable after refresh
     }
 
 private:

@@ -22,6 +22,8 @@ CreateDialog::CreateDialog(QWidget *parent)
 
     connect(m_fetcher.get(), &YahooFinanceFetcher::symbolsFetched,
             this, [this](const QList<QPair<QString, QString>> &symbols) {
+                m_symbolAndNameCompleter->setModel(nullptr); // Clear previous model
+                
                 QStringList assetList;
                 for (const auto &pair : symbols) {
                     assetList << pair.first + " | " + pair.second;

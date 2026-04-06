@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     
     QApplication application(argc, argv);
     application.setApplicationName("Hisse Beyan Yardımcısı");
-    application.setApplicationVersion("0.2");
+    application.setApplicationVersion("0.2.2");
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Turkish stock tax calculator");

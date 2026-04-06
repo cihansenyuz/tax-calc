@@ -22,8 +22,11 @@ void EvdsFetcher::fetchExchangeRate(QDate date) {
 }
 
 void EvdsFetcher::fetchInflationIndex(QDate date) {
-    QString startDate = date.addMonths(-1).toString("dd-MM-yyyy");
-    QString endDate = startDate;
+    // Set the date range to the first day of the previous month
+    QDate prevMonth = date.addMonths(-1);
+    QDate firstDayPrevMonth(prevMonth.year(), prevMonth.month(), 1);
+    QString startDate = firstDayPrevMonth.toString("dd-MM-yyyy");
+    QString endDate = futureDate_.toString("dd-MM-yyyy");
     QString url = QString("%1%2&startDate=%3&endDate=%4&type=json&aggregationTypes=last")
                         .arg(API_END_POINT, SERIES_INFLATION, startDate, endDate);
     qDebug(logNetwork) << "Fetching symbols with query:" << url;

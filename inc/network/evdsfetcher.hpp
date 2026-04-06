@@ -32,4 +32,5 @@ private slots:
 private:
     HttpManager *http_manager_;
     GetRequest *getRequest_;
+    QDate futureDate_{2999, 1, 1}; // A far future date to ensure we get the latest data
 };

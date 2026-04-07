@@ -29,6 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onSelectButtonClicked);
     connect(ui->resetPotCalcButton, &QPushButton::clicked,
             this, &MainWindow::onResetPotCalcButtonClicked);
+    connect(ui->declaretionLimitSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+        this, [this]() {
+        if(ui->potentialCalculatedTaxLabel->text().isEmpty())
+            calculateTotalTaxBase();
+        else
+            calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
+        });
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(transaction_manager->getTransactions());

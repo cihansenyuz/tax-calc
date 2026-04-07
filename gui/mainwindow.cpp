@@ -65,6 +65,7 @@ void MainWindow::onCleanSelectionButtonClicked() {
     ui->symbolLabel->clear();
     ui->quantityLabel->clear();
     ui->IDlabel->clear();
+    onResetPotCalcButtonClicked();
 }
 
 void MainWindow::onCreateButtonClicked() {
@@ -93,6 +94,8 @@ void MainWindow::onDeletePositionButtonClicked() {
         return;
     }
     QMessageBox::information(this, "Pozisyon Sil", "Pozisyon başarıyla silindi.");
+    onCleanSelectionButtonClicked();
+    onResetPotCalcButtonClicked();
 }
 
 void MainWindow::onCloseTransactionButtonClicked() {

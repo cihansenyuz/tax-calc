@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <vector>
 
 #include "../inc/transactionmanager.hpp"
 #include "../inc/network/evdsfetcher.hpp"
@@ -34,6 +35,7 @@ private:
     std::unique_ptr<CreateDialog> m_create_dialog;
     TransactionManager *transaction_manager;
     TransactionTable m_table{this};
+    std::vector<Transaction> m_selectedTransactions;
 
     void calculateTotalTaxBase(double potential = 0.0);
 };

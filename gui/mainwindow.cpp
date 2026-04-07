@@ -192,12 +192,14 @@ void MainWindow::onSelectButtonClicked() {
         return;
     }
 
+    m_selectedTransactions.clear();
     QStringList symbols, quantities, idStrings;
     for (const QString &idStr : ids) {
-        Transaction t = transaction_manager->findTransactionById(idStr.toInt());
-        symbols    << QString::fromStdString(t.getSymbol());
-        quantities << QString::number(t.getQuantity());
-        idStrings  << QString::number(t.getId());
+        Transaction selectedTransaction = transaction_manager->findTransactionById(idStr.toInt());
+        m_selectedTransactions.push_back(selectedTransaction);
+        symbols    << QString::fromStdString(selectedTransaction.getSymbol());
+        quantities << QString::number(selectedTransaction.getQuantity());
+        idStrings  << QString::number(selectedTransaction.getId());
     }
 
     ui->symbolLabel->setText(symbols.join("\n"));

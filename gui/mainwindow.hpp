@@ -27,6 +27,7 @@ private slots:
     void onCleanSelectionButtonClicked();
     void onFetchFailed(const QString &error);
     void onSelectButtonClicked();
+    void onResetPotCalcButtonClicked();
 
 private:
     Ui::MainWindow *ui;

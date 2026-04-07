@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onFetchFailed);
     connect(ui->selectButton, &QPushButton::clicked,
             this, &MainWindow::onSelectButtonClicked);
+    connect(ui->resetPotCalcButton, &QPushButton::clicked,
+            this, &MainWindow::onResetPotCalcButtonClicked);
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(transaction_manager->getTransactions());
@@ -113,6 +115,8 @@ void MainWindow::onCloseTransactionButtonClicked() {
     selectedTransaction.setStatus(Transaction::Status::Closed);
 
     transaction_manager->closeTransaction(selectedTransaction);
+    onCleanSelectionButtonClicked();
+    onResetPotCalcButtonClicked();
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {
@@ -186,4 +190,10 @@ void MainWindow::onSelectButtonClicked() {
     ui->symbolLabel->setText(QString::fromStdString(selectedTransaction.getSymbol()));
     ui->quantityLabel->setText(QString::number(selectedTransaction.getQuantity()));
     ui->IDlabel->setText(QString::number(selectedTransaction.getId()));
+}
+
+void MainWindow::onResetPotCalcButtonClicked() {
+    ui->potentialSellPriceSpinBox->setValue(0.0);
+    ui->potentialCalculatedTaxLabel->clear();
+    calculateTotalTaxBase();
 }

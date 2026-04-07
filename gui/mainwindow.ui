@@ -300,9 +300,6 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5"/>
-    </item>
-    <item>
      <widget class="QGroupBox" name="potHesapGroupBox">
       <property name="title">
        <string/>

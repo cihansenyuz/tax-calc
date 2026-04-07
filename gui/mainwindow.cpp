@@ -186,20 +186,23 @@ void MainWindow::calculateTotalTaxBase(double potential) {
 }
 
 void MainWindow::onSelectButtonClicked() {
-    int selectedRow = m_table.currentRow();
-    if (selectedRow < 0) {
+    const QList<QString> &ids = m_table.selectedIds();
+    if (ids.isEmpty()) {
         QMessageBox::warning(this, "Seçim Hatası", "Lütfen kapatılacak bir işlem seçin.");
         return;
     }
-    QTableWidgetItem *item = m_table.item(selectedRow, 0);
-    if (!item) {
-        QMessageBox::warning(this, "Seçim Hatası", "Geçerli bir işlem seçilmedi.");
-        return;
+
+    QStringList symbols, quantities, idStrings;
+    for (const QString &idStr : ids) {
+        Transaction t = transaction_manager->findTransactionById(idStr.toInt());
+        symbols    << QString::fromStdString(t.getSymbol());
+        quantities << QString::number(t.getQuantity());
+        idStrings  << QString::number(t.getId());
     }
-    Transaction selectedTransaction = transaction_manager->findTransactionById(item->text().toInt());
-    ui->symbolLabel->setText(QString::fromStdString(selectedTransaction.getSymbol()));
-    ui->quantityLabel->setText(QString::number(selectedTransaction.getQuantity()));
-    ui->IDlabel->setText(QString::number(selectedTransaction.getId()));
+
+    ui->symbolLabel->setText(symbols.join("\n"));
+    ui->quantityLabel->setText(quantities.join("\n"));
+    ui->IDlabel->setText(idStrings.join("\n"));
 }
 
 void MainWindow::onResetPotCalcButtonClicked() {

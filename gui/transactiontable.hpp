@@ -2,8 +2,8 @@
 
 #include <QTableWidget>
 #include <QDate>
-#include <iostream>
 #include "../inc/transaction.hpp"
+#include "../inc/logger.hpp"
 
 // Custom item class that sorts dates correctly
 class DateTableWidgetItem : public QTableWidgetItem {
@@ -44,9 +44,7 @@ public:
             QTableWidgetItem *idItem = this->item(row, 0);
             if (idItem) m_selectedIds.append(idItem->text());
         }
-        std::cout << "Selected IDs:";
-        for (const QString &id : m_selectedIds) std::cout << " " << id.toStdString();
-        std::cout << std::endl;
+        qCDebug(logGui) << "Selected IDs:" << m_selectedIds;
     });
 }
 

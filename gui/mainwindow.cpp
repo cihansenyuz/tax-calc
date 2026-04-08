@@ -221,29 +221,27 @@ void MainWindow::runNext(DrainContext &ctx, Qt::ConnectionType connType) {
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {
-    if (ui->IDlabel->text().isEmpty()) {
+    if (m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Seçim Hatası", "Potansiyel vergi hesaplamak için lütfen bir pozisyon seçin.");
         return;
     }
 
-    Transaction selectedTransaction = transaction_manager->findTransactionById(ui->IDlabel->text().toInt());
     double potentialSellPrice = ui->potentialSellPriceSpinBox->value();
-    QDate currentDate = QDate::currentDate();
-
     if (potentialSellPrice <= 0) {
         QMessageBox::warning(this, "Giriş Hatası", "Lütfen geçerli bir satış fiyatı girin.");
         return;
     }
 
-    selectedTransaction.setSellDate(currentDate);
-    selectedTransaction.setSellPrice(potentialSellPrice);
+    QDate currentDate = QDate::currentDate();
+    m_potentialDrain.queue = {};
+    for (Transaction t : m_selectedTransactions) {
+        t.setSellDate(currentDate);
+        t.setSellPrice(potentialSellPrice);
+        m_potentialDrain.queue.push(t);
+    }
 
-    connect(transaction_manager, &TransactionManager::potentialTaxBaseReady,
-            this, [this](double potentialTaxBase) {
-                ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2) + " ₺");
-                calculateTotalTaxBase(potentialTaxBase);
-            }, Qt::SingleShotConnection);
-    transaction_manager->potentialTransaction(selectedTransaction);
+    m_potentialAccumulator = 0.0;
+    runNextPotential();
 }
 
 void MainWindow::onFetchFailed(const QString &error) {

@@ -196,6 +196,15 @@ void MainWindow::abortClose(const QString &error) {
                           << m_closeDrain.pendingId << "Error:" << error;
 }
 
+void MainWindow::abortPotentialCalc(const QString &error) {
+    QObject::disconnect(m_potentialDrain.nextConnection);
+    QMessageBox::warning(this, "Potansiyel Hesaplama", error);
+    m_potentialDrain.queue = {};
+    m_potentialAccumulator = 0.0;
+    qCritical(logNetwork) << "Failed potential calc due to EVDS API error with ID:"
+                          << m_potentialDrain.pendingId << "Error:" << error;
+}
+
 void MainWindow::runNext(DrainContext &ctx, Qt::ConnectionType connType) {
     if (ctx.queue.empty()) {
         if (ctx.progressDialog) {

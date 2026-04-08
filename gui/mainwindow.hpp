@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QProgressDialog>
 #include <vector>
+#include <deque>
 
 #include "../inc/transactionmanager.hpp"
 #include "../inc/network/evdsfetcher.hpp"
@@ -29,6 +31,7 @@ private slots:
     void onFetchFailed(const QString &error);
     void onSelectButtonClicked();
     void onResetPotCalcButtonClicked();
+    void closeNextTransaction();
 
 private:
     Ui::MainWindow *ui;
@@ -36,6 +39,11 @@ private:
     TransactionManager *transaction_manager;
     TransactionTable m_table{this};
     std::vector<Transaction> m_selectedTransactions;
+    std::deque<Transaction> m_transactionsToClose;
+    QDate m_pendingCloseSellDate;
+    double m_pendingCloseSellPrice = 0.0;
+    QProgressDialog *m_closeProgressDialog = nullptr;
+    int m_closeTotal = 0;
 
     void calculateTotalTaxBase(double potential = 0.0);
 };

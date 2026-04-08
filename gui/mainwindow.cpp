@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "../inc/calculator.hpp"
 #include <QMessageBox>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -63,7 +64,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::onDatabaseReady() {
-    // qDebug() << "Database is ready, refreshing table.";
+    qDebug() << "Database is ready, refreshing table.";
     m_table.refresh(transaction_manager->getTransactions());
     calculateTotalTaxBase();
 }
@@ -106,12 +107,11 @@ void MainWindow::onDeletePositionButtonClicked() {
 }
 
 void MainWindow::onCloseTransactionButtonClicked() {
-    if (ui->IDlabel->text().isEmpty()) {
+    if (m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Giriş Hatası", "Kapatılacak pozisyon seçilmedi.");
         return;
     }
 
-    Transaction selectedTransaction = transaction_manager->findTransactionById(ui->IDlabel->text().toInt());
     double sellPrice = ui->sellPriceSpinBox->value();
     QDate sellDate = ui->sellDateEdit->date();
 
@@ -120,13 +120,49 @@ void MainWindow::onCloseTransactionButtonClicked() {
         return;
     }
 
-    selectedTransaction.setSellDate(sellDate);
-    selectedTransaction.setSellPrice(sellPrice);
-    selectedTransaction.setStatus(Transaction::Status::Closed);
+    m_transactionsToClose.clear();
+    for (Transaction t : m_selectedTransactions) {
+        t.setSellDate(sellDate);
+        t.setSellPrice(sellPrice);
+        t.setStatus(Transaction::Status::Closed);
+        m_transactionsToClose.push_back(t);
+    }
 
-    transaction_manager->closeTransaction(selectedTransaction);
-    onCleanSelectionButtonClicked();
-    onResetPotCalcButtonClicked();
+    m_closeTotal = static_cast<int>(m_transactionsToClose.size());
+    m_closeProgressDialog = new QProgressDialog("Pozisyonlar kapatılıyor...", QString(), 0, m_closeTotal, this);
+    m_closeProgressDialog->setWindowModality(Qt::WindowModal);
+    m_closeProgressDialog->setMinimumDuration(0);
+    m_closeProgressDialog->setValue(0);
+
+    closeNextTransaction();
+}
+
+void MainWindow::closeNextTransaction() {
+    if (m_transactionsToClose.empty()) {
+        if (m_closeProgressDialog) {
+            m_closeProgressDialog->setValue(m_closeTotal);
+            m_closeProgressDialog->deleteLater();
+            m_closeProgressDialog = nullptr;
+        }
+        onCleanSelectionButtonClicked();
+        onResetPotCalcButtonClicked();
+        return;
+    }
+
+    if (m_closeProgressDialog)
+        m_closeProgressDialog->setValue(m_closeTotal - static_cast<int>(m_transactionsToClose.size()));
+
+    Transaction t = m_transactionsToClose.front();
+    m_transactionsToClose.pop_front();
+
+    connect(transaction_manager, &TransactionManager::databaseReady,
+            this, &MainWindow::closeNextTransaction, Qt::SingleShotConnection);
+    
+    qDebug() << "Closing transaction with ID:" << t.getId();
+    // Needs to be delayed to get respond from EVDS API
+    QTimer::singleShot(1000, this, [this, t]() {
+        transaction_manager->closeTransaction(t);
+    });
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {

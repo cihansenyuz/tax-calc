@@ -220,6 +220,26 @@ void MainWindow::runNext(DrainContext &ctx, Qt::ConnectionType connType) {
     ctx.action(t);
 }
 
+void MainWindow::runNextPotential() {
+    if (m_potentialDrain.queue.empty()) {
+        m_potentialDrain.onDone();
+        return;
+    }
+
+    Transaction t = m_potentialDrain.queue.front();
+    m_potentialDrain.queue.pop();
+    m_potentialDrain.pendingId = t.getId();
+
+    m_potentialDrain.nextConnection = connect(
+        transaction_manager, &TransactionManager::potentialTaxBaseReady,
+        this, [this](double potentialTaxBase) {
+            m_potentialAccumulator += potentialTaxBase;
+            runNextPotential();
+        }, Qt::SingleShotConnection);
+
+    m_potentialDrain.action(t);
+}
+
 void MainWindow::onPotentialCalculateButtonClicked() {
     if (m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Seçim Hatası", "Potansiyel vergi hesaplamak için lütfen bir pozisyon seçin.");

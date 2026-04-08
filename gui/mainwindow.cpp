@@ -90,22 +90,42 @@ void MainWindow::onCreateButtonClicked() {
 }
 
 void MainWindow::onDeletePositionButtonClicked() {
-    if(ui->IDlabel->text().isEmpty()) {
+    if(m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Pozisyon Sil", "Silinecek pozisyon seçilmedi.");
         return;
     }
 
-    int id = ui->IDlabel->text().toInt();
-                
-    try{
-        transaction_manager->removeTransaction(id);
-    } catch (const std::runtime_error& e) {
-        QMessageBox::warning(this, "Pozisyon Sil", e.what());
+    m_transactionsToDelete.clear();
+    for (const Transaction& t : m_selectedTransactions)
+        m_transactionsToDelete.push_back(t);
+
+    deleteNextTransaction();
+}
+
+void MainWindow::deleteNextTransaction() {
+    if (m_transactionsToDelete.empty()) {
+        QMessageBox::information(this, "Pozisyon Sil", "Seçili pozisyonlar başarıyla silindi.");
+        onCleanSelectionButtonClicked();
         return;
     }
-    QMessageBox::information(this, "Pozisyon Sil", "Pozisyon başarıyla silindi.");
-    onCleanSelectionButtonClicked();
-    onResetPotCalcButtonClicked();
+
+    Transaction t = m_transactionsToDelete.front();
+    m_transactionsToDelete.pop_front();
+
+    connect(transaction_manager, &TransactionManager::databaseReady,
+            this, &MainWindow::deleteNextTransaction,
+            static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
+
+    qDebug() << "Deleting transaction with ID:" << t.getId();
+    try {
+        transaction_manager->removeTransaction(t.getId());
+    } catch (const std::runtime_error& e) {
+        disconnect(transaction_manager, &TransactionManager::databaseReady,
+                   this, &MainWindow::deleteNextTransaction);
+        QMessageBox::warning(this, "Pozisyon Sil", e.what());
+        m_transactionsToDelete.clear();
+        onCleanSelectionButtonClicked();
+    }
 }
 
 void MainWindow::onCloseTransactionButtonClicked() {

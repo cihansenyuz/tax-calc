@@ -33,6 +33,7 @@ private slots:
     void onSelectButtonClicked();
     void onResetPotCalcButtonClicked();
     void abortClose(const QString &error);
+    void abortPotentialCalc(const QString &error);
 
 private:
     Ui::MainWindow *ui;
@@ -52,7 +53,10 @@ private:
     };
     DrainContext m_closeDrain;
     DrainContext m_deleteDrain;
+    DrainContext m_potentialDrain;
+    double m_potentialAccumulator = 0.0;
 
     void runNext(DrainContext &ctx, Qt::ConnectionType connType = Qt::SingleShotConnection);
+    void runNextPotential();
     void calculateTotalTaxBase(double potential = 0.0);
 };

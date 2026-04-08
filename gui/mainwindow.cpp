@@ -110,7 +110,12 @@ MainWindow::MainWindow(QWidget *parent)
     m_potentialDrain.action = [this](const Transaction &t) {
         connect(transaction_manager, &TransactionManager::fetchFailed,
                 this, &MainWindow::abortPotentialCalc, Qt::SingleShotConnection);
-        transaction_manager->potentialTransaction(t);
+
+        qDebug() << "Calculating potential tax base for ID:" << t.getId();
+        
+        QTimer::singleShot(1000, this, [this, t]() {
+                transaction_manager->potentialTransaction(t);
+        });
     };
 
     m_potentialDrain.onDone = [this]() {

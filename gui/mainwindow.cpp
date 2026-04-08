@@ -221,6 +221,10 @@ void MainWindow::abortClose(const QString &error) {
 
 void MainWindow::abortPotentialCalc(const QString &error) {
     QObject::disconnect(m_potentialDrain.nextConnection);
+    if (m_potentialDrain.progressDialog) {
+        m_potentialDrain.progressDialog->deleteLater();
+        m_potentialDrain.progressDialog = nullptr;
+    }
     QMessageBox::warning(this, "Potansiyel Hesaplama", error);
     m_potentialDrain.queue = {};
     m_potentialAccumulator = 0.0;
@@ -270,6 +274,12 @@ void MainWindow::onPotentialCalculateButtonClicked() {
         t.setSellPrice(potentialSellPrice);
         m_potentialDrain.queue.push(t);
     }
+
+    m_potentialDrain.total = static_cast<int>(m_potentialDrain.queue.size());
+    m_potentialDrain.progressDialog = new QProgressDialog("Potansiyel gelir ve vergisi hesaplanıyor...", QString(), 0, m_potentialDrain.total, this);
+    m_potentialDrain.progressDialog->setWindowModality(Qt::WindowModal);
+    m_potentialDrain.progressDialog->setMinimumDuration(0);
+    m_potentialDrain.progressDialog->setValue(0);
 
     m_potentialAccumulator = 0.0;
     runNext(m_potentialDrain);

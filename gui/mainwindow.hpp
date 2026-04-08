@@ -38,8 +38,8 @@ private:
     std::unique_ptr<CreateDialog> m_create_dialog;
     TransactionManager *transaction_manager;
     TransactionTable m_table{this};
-    std::vector<Transaction> m_selectedTransactions;
-    std::deque<Transaction> m_transactionsToClose;
+    std::vector<Transaction> m_selectedTransactions; // the transactions currently selected in the table
+    std::deque<Transaction> m_transactionsToClose; // queue of transactions to close, used for sequential closing with progress dialog
     QDate m_pendingCloseSellDate;
     double m_pendingCloseSellPrice = 0.0;
     QProgressDialog *m_closeProgressDialog = nullptr;

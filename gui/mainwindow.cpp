@@ -70,6 +70,8 @@ void MainWindow::onDatabaseReady() {
 }
 
 void MainWindow::onCleanSelectionButtonClicked() {
+    m_table.clearSelection();
+    m_selectedTransactions.clear();
     ui->symbolLabel->clear();
     ui->quantityLabel->clear();
     ui->IDlabel->clear();

@@ -33,6 +33,7 @@ private slots:
     void onResetPotCalcButtonClicked();
     void closeNextTransaction();
     void deleteNextTransaction();
+    void abortClose(const QString &error);
 
 private:
     Ui::MainWindow *ui;
@@ -44,6 +45,7 @@ private:
     std::queue<Transaction> m_transactionsToDelete; // queue of transactions to delete, used for sequential deletion
     QProgressDialog *m_closeProgressDialog = nullptr;
     int m_closeTotal = 0;
+    int m_pendingCloseId = 0;
 
     void calculateTotalTaxBase(double potential = 0.0);
 };

@@ -185,26 +185,28 @@ void MainWindow::closeNextTransaction() {
             this, &MainWindow::closeNextTransaction, Qt::SingleShotConnection);
 
     connect(transaction_manager, &TransactionManager::fetchFailed,
-            this, [this, t](const QString &error) {
-                disconnect(transaction_manager, &TransactionManager::databaseReady,
-                           this, &MainWindow::closeNextTransaction);
-                if (m_closeProgressDialog) {
-                    m_closeProgressDialog->deleteLater();
-                    m_closeProgressDialog = nullptr;
-                }
-                QMessageBox::warning(this, "Pozisyon Kapat", error);
-                m_transactionsToClose = {};
-                onCleanSelectionButtonClicked();
-                qCritical(logNetwork) << "Failed to close transaction due to EVDS API error with ID:"
-                                      << t.getId() << "Error:" << error;
-            }, Qt::SingleShotConnection);
-                
-    
+            this, &MainWindow::abortClose, Qt::SingleShotConnection);
+
+    m_pendingCloseId = t.getId();
     qDebug() << "Closing transaction with ID:" << t.getId();
     // Needs to be delayed to get respond from EVDS API
     QTimer::singleShot(1000, this, [this, t]() {
         transaction_manager->closeTransaction(t);
     });
+}
+
+void MainWindow::abortClose(const QString &error) {
+    disconnect(transaction_manager, &TransactionManager::databaseReady,
+               this, &MainWindow::closeNextTransaction);
+    if (m_closeProgressDialog) {
+        m_closeProgressDialog->deleteLater();
+        m_closeProgressDialog = nullptr;
+    }
+    QMessageBox::warning(this, "Pozisyon Kapat", error);
+    m_transactionsToClose = {};
+    onCleanSelectionButtonClicked();
+    qCritical(logNetwork) << "Failed to close transaction due to EVDS API error with ID:"
+                          << m_pendingCloseId << "Error:" << error;
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {

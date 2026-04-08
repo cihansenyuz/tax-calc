@@ -53,15 +53,50 @@ MainWindow::MainWindow(QWidget *parent)
                     calculateTotalTaxBase();
                 else
                     calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
-            });
+    });
 
+    // Drain loop setups starts here.
+    m_closeDrain.action = [this](const Transaction &t) {
+        connect(transaction_manager, &TransactionManager::fetchFailed,
+                this, &MainWindow::abortClose, Qt::SingleShotConnection);
+        
+        qDebug() << "Closing transaction with ID:" << t.getId();
+        
+        QTimer::singleShot(1000, this, [this, t]() {
+                transaction_manager->closeTransaction(t);
+        });
+    };
+
+    m_closeDrain.onDone = [this]() {
+        onCleanSelectionButtonClicked();
+        onResetPotCalcButtonClicked();
+    };
+
+    m_deleteDrain.action = [this](const Transaction &t) {
+        qDebug() << "Deleting transaction with ID:" << t.getId();
+        try {
+            transaction_manager->removeTransaction(t.getId());
+        } catch (const std::runtime_error &e) {
+            QObject::disconnect(m_deleteDrain.nextConnection);
+            QMessageBox::warning(this, "Pozisyon Sil", e.what());
+            m_deleteDrain.queue = {};
+            onCleanSelectionButtonClicked();
+        }
+    };
+
+    m_deleteDrain.onDone = [this]() {
+        QMessageBox::information(this, "Pozisyon Sil", "Seçili pozisyonlar başarıyla silindi.");
+        onCleanSelectionButtonClicked();
+    };
+    // Drain loop setups ends here.
+    
     calculateTotalTaxBase();
 }
 
 MainWindow::~MainWindow() {
-    if (m_closeProgressDialog) {
-        m_closeProgressDialog->deleteLater();
-        m_closeProgressDialog = nullptr;
+    if (m_closeDrain.progressDialog) {
+        m_closeDrain.progressDialog->deleteLater();
+        m_closeDrain.progressDialog = nullptr;
     }
     delete transaction_manager;
     delete ui;
@@ -99,37 +134,11 @@ void MainWindow::onDeletePositionButtonClicked() {
         return;
     }
 
-    m_transactionsToDelete = {};
+    m_deleteDrain.queue = {};
     for (const Transaction& t : m_selectedTransactions)
-        m_transactionsToDelete.push(t);
+        m_deleteDrain.queue.push(t);
 
-    deleteNextTransaction();
-}
-
-void MainWindow::deleteNextTransaction() {
-    if (m_transactionsToDelete.empty()) {
-        QMessageBox::information(this, "Pozisyon Sil", "Seçili pozisyonlar başarıyla silindi.");
-        onCleanSelectionButtonClicked();
-        return;
-    }
-
-    Transaction t = m_transactionsToDelete.front();
-    m_transactionsToDelete.pop();
-
-    connect(transaction_manager, &TransactionManager::databaseReady,
-            this, &MainWindow::deleteNextTransaction,
-            static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
-
-    qDebug() << "Deleting transaction with ID:" << t.getId();
-    try {
-        transaction_manager->removeTransaction(t.getId());
-    } catch (const std::runtime_error& e) {
-        disconnect(transaction_manager, &TransactionManager::databaseReady,
-                   this, &MainWindow::deleteNextTransaction);
-        QMessageBox::warning(this, "Pozisyon Sil", e.what());
-        m_transactionsToDelete = {};
-        onCleanSelectionButtonClicked();
-    }
+    runNext(m_deleteDrain, static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
 }
 
 void MainWindow::onCloseTransactionButtonClicked() {
@@ -146,67 +155,58 @@ void MainWindow::onCloseTransactionButtonClicked() {
         return;
     }
 
-    m_transactionsToClose = {};
+    m_closeDrain.queue = {};
     for (Transaction t : m_selectedTransactions) {
         t.setSellDate(sellDate);
         t.setSellPrice(sellPrice);
         t.setStatus(Transaction::Status::Closed);
-        m_transactionsToClose.push(t);
+        m_closeDrain.queue.push(t);
     }
 
-    m_closeTotal = static_cast<int>(m_transactionsToClose.size());
-    m_closeProgressDialog = new QProgressDialog("Pozisyonlar kapatılıyor...", QString(), 0, m_closeTotal, this);
-    m_closeProgressDialog->setWindowModality(Qt::WindowModal);
-    m_closeProgressDialog->setMinimumDuration(0);
-    m_closeProgressDialog->setValue(0);
+    m_closeDrain.total = static_cast<int>(m_closeDrain.queue.size());
+    m_closeDrain.progressDialog = new QProgressDialog("Pozisyonlar kapatılıyor...", QString(), 0, m_closeDrain.total, this);
+    m_closeDrain.progressDialog->setWindowModality(Qt::WindowModal);
+    m_closeDrain.progressDialog->setMinimumDuration(0);
+    m_closeDrain.progressDialog->setValue(0);
 
-    closeNextTransaction();
-}
-
-void MainWindow::closeNextTransaction() {
-    if (m_transactionsToClose.empty()) {
-        if (m_closeProgressDialog) {
-            m_closeProgressDialog->setValue(m_closeTotal);
-            m_closeProgressDialog->deleteLater();
-            m_closeProgressDialog = nullptr;
-        }
-        onCleanSelectionButtonClicked();
-        onResetPotCalcButtonClicked();
-        return;
-    }
-
-    if (m_closeProgressDialog)
-        m_closeProgressDialog->setValue(m_closeTotal - static_cast<int>(m_transactionsToClose.size()));
-
-    Transaction t = m_transactionsToClose.front();
-    m_transactionsToClose.pop();
-
-    connect(transaction_manager, &TransactionManager::databaseReady,
-            this, &MainWindow::closeNextTransaction, Qt::SingleShotConnection);
-
-    connect(transaction_manager, &TransactionManager::fetchFailed,
-            this, &MainWindow::abortClose, Qt::SingleShotConnection);
-
-    m_pendingCloseId = t.getId();
-    qDebug() << "Closing transaction with ID:" << t.getId();
-    // Needs to be delayed to get respond from EVDS API
-    QTimer::singleShot(1000, this, [this, t]() {
-        transaction_manager->closeTransaction(t);
-    });
+    runNext(m_closeDrain);
 }
 
 void MainWindow::abortClose(const QString &error) {
-    disconnect(transaction_manager, &TransactionManager::databaseReady,
-               this, &MainWindow::closeNextTransaction);
-    if (m_closeProgressDialog) {
-        m_closeProgressDialog->deleteLater();
-        m_closeProgressDialog = nullptr;
+    QObject::disconnect(m_closeDrain.nextConnection);
+    if (m_closeDrain.progressDialog) {
+        m_closeDrain.progressDialog->deleteLater();
+        m_closeDrain.progressDialog = nullptr;
     }
     QMessageBox::warning(this, "Pozisyon Kapat", error);
-    m_transactionsToClose = {};
+    m_closeDrain.queue = {};
     onCleanSelectionButtonClicked();
     qCritical(logNetwork) << "Failed to close transaction due to EVDS API error with ID:"
-                          << m_pendingCloseId << "Error:" << error;
+                          << m_closeDrain.pendingId << "Error:" << error;
+}
+
+void MainWindow::runNext(DrainContext &ctx, Qt::ConnectionType connType) {
+    if (ctx.queue.empty()) {
+        if (ctx.progressDialog) {
+            ctx.progressDialog->setValue(ctx.total);
+            ctx.progressDialog->deleteLater();
+            ctx.progressDialog = nullptr;
+        }
+        ctx.onDone();
+        return;
+    }
+
+    if (ctx.progressDialog)
+        ctx.progressDialog->setValue(ctx.total - static_cast<int>(ctx.queue.size()));
+
+    Transaction t = ctx.queue.front();
+    ctx.queue.pop();
+    ctx.pendingId = t.getId();
+
+    ctx.nextConnection = connect(transaction_manager, &TransactionManager::databaseReady,
+            this, [this, &ctx, connType]() { runNext(ctx, connType); }, connType);
+
+    ctx.action(t);
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {

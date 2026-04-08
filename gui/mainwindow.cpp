@@ -59,6 +59,10 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
+    if (m_closeProgressDialog) {
+        m_closeProgressDialog->deleteLater();
+        m_closeProgressDialog = nullptr;
+    }
     delete transaction_manager;
     delete ui;
 }

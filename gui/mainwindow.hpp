@@ -42,8 +42,6 @@ private:
     std::vector<Transaction> m_selectedTransactions; // the transactions currently selected in the table
     std::deque<Transaction> m_transactionsToClose; // queue of transactions to close, used for sequential closing with progress dialog
     std::deque<Transaction> m_transactionsToDelete; // queue of transactions to delete, used for sequential deletion
-    QDate m_pendingCloseSellDate;
-    double m_pendingCloseSellPrice = 0.0;
     QProgressDialog *m_closeProgressDialog = nullptr;
     int m_closeTotal = 0;
 

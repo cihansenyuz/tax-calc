@@ -179,6 +179,22 @@ void MainWindow::closeNextTransaction() {
 
     connect(transaction_manager, &TransactionManager::databaseReady,
             this, &MainWindow::closeNextTransaction, Qt::SingleShotConnection);
+
+    connect(transaction_manager, &TransactionManager::fetchFailed,
+            this, [this](const QString &error) {
+                disconnect(transaction_manager, &TransactionManager::databaseReady,
+                           this, &MainWindow::closeNextTransaction);
+                if (m_closeProgressDialog) {
+                    m_closeProgressDialog->deleteLater();
+                    m_closeProgressDialog = nullptr;
+                }
+                QMessageBox::warning(this, "Pozisyon Kapat", error);
+                m_transactionsToClose.clear();
+                onCleanSelectionButtonClicked();
+                qCritical(logNetwork) << "Failed to close transaction due to EVDS API error with ID:"
+                                      << t.getId() << "Error:" << error;
+            }, Qt::SingleShotConnection);
+                
     
     qDebug() << "Closing transaction with ID:" << t.getId();
     // Needs to be delayed to get respond from EVDS API

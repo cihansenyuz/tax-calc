@@ -88,6 +88,17 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::information(this, "Pozisyon Sil", "Seçili pozisyonlar başarıyla silindi.");
         onCleanSelectionButtonClicked();
     };
+
+    m_potentialDrain.action = [this](const Transaction &t) {
+        connect(transaction_manager, &TransactionManager::fetchFailed,
+                this, &MainWindow::abortPotentialCalc, Qt::SingleShotConnection);
+        transaction_manager->potentialTransaction(t);
+    };
+
+    m_potentialDrain.onDone = [this]() {
+        ui->potentialCalculatedTaxLabel->setText(QString::number(m_potentialAccumulator, 'f', 2) + " ₺");
+        calculateTotalTaxBase(m_potentialAccumulator);
+    };
     // Drain loop setups ends here.
     
     calculateTotalTaxBase();

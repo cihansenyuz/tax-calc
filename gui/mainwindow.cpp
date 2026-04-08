@@ -99,9 +99,9 @@ void MainWindow::onDeletePositionButtonClicked() {
         return;
     }
 
-    m_transactionsToDelete.clear();
+    m_transactionsToDelete = {};
     for (const Transaction& t : m_selectedTransactions)
-        m_transactionsToDelete.push_back(t);
+        m_transactionsToDelete.push(t);
 
     deleteNextTransaction();
 }
@@ -114,7 +114,7 @@ void MainWindow::deleteNextTransaction() {
     }
 
     Transaction t = m_transactionsToDelete.front();
-    m_transactionsToDelete.pop_front();
+    m_transactionsToDelete.pop();
 
     connect(transaction_manager, &TransactionManager::databaseReady,
             this, &MainWindow::deleteNextTransaction,
@@ -127,7 +127,7 @@ void MainWindow::deleteNextTransaction() {
         disconnect(transaction_manager, &TransactionManager::databaseReady,
                    this, &MainWindow::deleteNextTransaction);
         QMessageBox::warning(this, "Pozisyon Sil", e.what());
-        m_transactionsToDelete.clear();
+        m_transactionsToDelete = {};
         onCleanSelectionButtonClicked();
     }
 }
@@ -146,12 +146,12 @@ void MainWindow::onCloseTransactionButtonClicked() {
         return;
     }
 
-    m_transactionsToClose.clear();
+    m_transactionsToClose = {};
     for (Transaction t : m_selectedTransactions) {
         t.setSellDate(sellDate);
         t.setSellPrice(sellPrice);
         t.setStatus(Transaction::Status::Closed);
-        m_transactionsToClose.push_back(t);
+        m_transactionsToClose.push(t);
     }
 
     m_closeTotal = static_cast<int>(m_transactionsToClose.size());
@@ -179,13 +179,13 @@ void MainWindow::closeNextTransaction() {
         m_closeProgressDialog->setValue(m_closeTotal - static_cast<int>(m_transactionsToClose.size()));
 
     Transaction t = m_transactionsToClose.front();
-    m_transactionsToClose.pop_front();
+    m_transactionsToClose.pop();
 
     connect(transaction_manager, &TransactionManager::databaseReady,
             this, &MainWindow::closeNextTransaction, Qt::SingleShotConnection);
 
     connect(transaction_manager, &TransactionManager::fetchFailed,
-            this, [this](const QString &error) {
+            this, [this, t](const QString &error) {
                 disconnect(transaction_manager, &TransactionManager::databaseReady,
                            this, &MainWindow::closeNextTransaction);
                 if (m_closeProgressDialog) {
@@ -193,7 +193,7 @@ void MainWindow::closeNextTransaction() {
                     m_closeProgressDialog = nullptr;
                 }
                 QMessageBox::warning(this, "Pozisyon Kapat", error);
-                m_transactionsToClose.clear();
+                m_transactionsToClose = {};
                 onCleanSelectionButtonClicked();
                 qCritical(logNetwork) << "Failed to close transaction due to EVDS API error with ID:"
                                       << t.getId() << "Error:" << error;

@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <QProgressDialog>
 #include <vector>
-#include <deque>
+#include <queue>
 
 #include "../inc/transactionmanager.hpp"
 #include "../inc/network/evdsfetcher.hpp"
@@ -40,8 +40,8 @@ private:
     TransactionManager *transaction_manager;
     TransactionTable m_table{this};
     std::vector<Transaction> m_selectedTransactions; // the transactions currently selected in the table
-    std::deque<Transaction> m_transactionsToClose; // queue of transactions to close, used for sequential closing with progress dialog
-    std::deque<Transaction> m_transactionsToDelete; // queue of transactions to delete, used for sequential deletion
+    std::queue<Transaction> m_transactionsToClose; // queue of transactions to close, used for sequential closing with progress dialog
+    std::queue<Transaction> m_transactionsToDelete; // queue of transactions to delete, used for sequential deletion
     QProgressDialog *m_closeProgressDialog = nullptr;
     int m_closeTotal = 0;
 

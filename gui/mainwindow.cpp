@@ -56,6 +56,11 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // Drain loop setups starts here.
+    m_closeDrain.connectAdvance = [this](std::function<void()> proceed) {
+        return connect(transaction_manager, &TransactionManager::databaseReady,
+                this, proceed, Qt::SingleShotConnection);
+    };
+
     m_closeDrain.action = [this](const Transaction &t) {
         connect(transaction_manager, &TransactionManager::fetchFailed,
                 this, &MainWindow::abortClose, Qt::SingleShotConnection);
@@ -70,6 +75,11 @@ MainWindow::MainWindow(QWidget *parent)
     m_closeDrain.onDone = [this]() {
         onCleanSelectionButtonClicked();
         onResetPotCalcButtonClicked();
+    };
+
+    m_deleteDrain.connectAdvance = [this](std::function<void()> proceed) {
+        return connect(transaction_manager, &TransactionManager::databaseReady,
+                this, proceed, static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
     };
 
     m_deleteDrain.action = [this](const Transaction &t) {
@@ -87,6 +97,14 @@ MainWindow::MainWindow(QWidget *parent)
     m_deleteDrain.onDone = [this]() {
         QMessageBox::information(this, "Pozisyon Sil", "Seçili pozisyonlar başarıyla silindi.");
         onCleanSelectionButtonClicked();
+    };
+
+    m_potentialDrain.connectAdvance = [this](std::function<void()> proceed) {
+        return connect(transaction_manager, &TransactionManager::potentialTaxBaseReady,
+                this, [this, proceed](double potentialTaxBase) {
+                    m_potentialAccumulator += potentialTaxBase;
+                    proceed();
+                }, Qt::SingleShotConnection);
     };
 
     m_potentialDrain.action = [this](const Transaction &t) {
@@ -149,7 +167,7 @@ void MainWindow::onDeletePositionButtonClicked() {
     for (const Transaction& t : m_selectedTransactions)
         m_deleteDrain.queue.push(t);
 
-    runNext(m_deleteDrain, static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
+    runNext(m_deleteDrain);
 }
 
 void MainWindow::onCloseTransactionButtonClicked() {
@@ -205,7 +223,7 @@ void MainWindow::abortPotentialCalc(const QString &error) {
                           << m_potentialDrain.pendingId << "Error:" << error;
 }
 
-void MainWindow::runNext(DrainContext &ctx, Qt::ConnectionType connType) {
+void MainWindow::runNext(DrainContext &ctx) {
     if (ctx.queue.empty()) {
         if (ctx.progressDialog) {
             ctx.progressDialog->setValue(ctx.total);
@@ -223,30 +241,9 @@ void MainWindow::runNext(DrainContext &ctx, Qt::ConnectionType connType) {
     ctx.queue.pop();
     ctx.pendingId = t.getId();
 
-    ctx.nextConnection = connect(transaction_manager, &TransactionManager::databaseReady,
-            this, [this, &ctx, connType]() { runNext(ctx, connType); }, connType);
+    ctx.nextConnection = ctx.connectAdvance([this, &ctx]() { runNext(ctx); });
 
     ctx.action(t);
-}
-
-void MainWindow::runNextPotential() {
-    if (m_potentialDrain.queue.empty()) {
-        m_potentialDrain.onDone();
-        return;
-    }
-
-    Transaction t = m_potentialDrain.queue.front();
-    m_potentialDrain.queue.pop();
-    m_potentialDrain.pendingId = t.getId();
-
-    m_potentialDrain.nextConnection = connect(
-        transaction_manager, &TransactionManager::potentialTaxBaseReady,
-        this, [this](double potentialTaxBase) {
-            m_potentialAccumulator += potentialTaxBase;
-            runNextPotential();
-        }, Qt::SingleShotConnection);
-
-    m_potentialDrain.action(t);
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {
@@ -270,7 +267,7 @@ void MainWindow::onPotentialCalculateButtonClicked() {
     }
 
     m_potentialAccumulator = 0.0;
-    runNextPotential();
+    runNext(m_potentialDrain);
 }
 
 void MainWindow::onFetchFailed(const QString &error) {

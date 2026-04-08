@@ -50,13 +50,13 @@ private:
         QMetaObject::Connection nextConnection;
         std::function<void(const Transaction &)> action;
         std::function<void()> onDone;
+        std::function<QMetaObject::Connection(std::function<void()>)> connectAdvance;
     };
     DrainContext m_closeDrain;
     DrainContext m_deleteDrain;
     DrainContext m_potentialDrain;
     double m_potentialAccumulator = 0.0;
 
-    void runNext(DrainContext &ctx, Qt::ConnectionType connType = Qt::SingleShotConnection);
-    void runNextPotential();
+    void runNext(DrainContext &ctx);
     void calculateTotalTaxBase(double potential = 0.0);
 };

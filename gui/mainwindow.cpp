@@ -1,7 +1,10 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 #include "../inc/calculator.hpp"
+#include "../inc/network/httpmanager.hpp"
+#include "evdskeysdialog.hpp"
 #include <QMessageBox>
+#include <QSettings>
 #include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -53,6 +56,17 @@ MainWindow::MainWindow(QWidget *parent)
                     calculateTotalTaxBase();
                 else
                     calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
+    });
+
+    connect(ui->actionEVDSKey, &QAction::triggered, this, [this]() {
+        EvdsKeyDialog dialog(this);
+        QSettings settings;
+        dialog.setCurrentKey(settings.value("evds/api_key").toString());
+        if (dialog.exec() == QDialog::Accepted) {
+            QString newKey = dialog.key();
+            settings.setValue("evds/api_key", newKey);
+            HttpManager::getInstance()->setKey(newKey);
+        }
     });
 
     // Drain loop setups starts here.

@@ -72,6 +72,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionEVDSKeyHelp, &QAction::triggered, this, [this]() {
         EvdsKeyHelpDialog dialog(this);
+        dialog.setText(
+            "<p><b>EVDS API anahtarınızı almak için aşağıdaki adımları izleyin:</b></p>"
+            "<ol>"
+            "<li><a href=\"https://evds3.tcmb.gov.tr/login\">https://evds3.tcmb.gov.tr/login</a> "
+            "adresine gidin.</li>"
+            "<li>Daha önce hesap oluşturduysanız <b>Giriş</b> sekmesinden giriş yapın. "
+            "İlk kez kullanıyorsanız <b>Kayıt</b> sekmesinden formu doldurup kayıt olun, "
+            "ardından giriş yapın.</li>"
+            "<li>Giriş başarılıysa tarayıcının sağ üst köşesinde "
+            "\"<i>Sisteme başarıyla giriş yapıldı</i>\" mesajını göreceksiniz.</li>"
+            "<li>Sağ üst köşedeki açılır menüye tıklayıp <b>Profilim</b>'i seçin.</li>"
+            "<li>Sayfanın en altında <b>API KEY KOPYALA</b> butonuna tıklayın. "
+            "Anahtar panonuza kopyalanacaktır.</li>"
+            "</ol>"
+            "<p><b>Anahtarı uygulamaya girmek için:</b></p>"
+            "<ol>"
+            "<li>Bu uygulamada <b>Ayarlar → EVDS anahtarını değiştir...</b> menüsünü açın.</li>"
+            "<li>Açılan alana anahtarı yapıştırın (<i>Ctrl+V</i>).</li>"
+            "<li><b>OK</b>'e tıklayın.</li>"
+            "</ol>"
+        );
         dialog.exec();
     });
 

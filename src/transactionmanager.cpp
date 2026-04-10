@@ -3,11 +3,15 @@
 #include "../inc/network/httpmanager.hpp"
 #include "../inc/calculator.hpp"
 #include "../inc/logger.hpp"
+#include <QSettings>
 
 TransactionManager::TransactionManager(QObject *parent)
     : QObject(parent) {
     m_http_manager = HttpManager::getInstance();
-    m_http_manager->setKey(EvdsFetcher::API_KEY);
+    {
+        QSettings settings;
+        m_http_manager->setKey(settings.value("evds/api_key").toString());
+    }
     m_evds_fetcher = new EvdsFetcher(m_http_manager, this);
     connect(m_evds_fetcher, &EvdsFetcher::evdsDataFetched, this, &TransactionManager::onEvdsDataFetched);
     connect(m_evds_fetcher, &EvdsFetcher::fetchFailed, this, &TransactionManager::onFetchFailed);

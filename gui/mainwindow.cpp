@@ -1,7 +1,11 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 #include "../inc/calculator.hpp"
+#include "../inc/network/httpmanager.hpp"
+#include "evdskeysdialog.hpp"
+#include "evdskeyhelpdiag.hpp"
 #include <QMessageBox>
+#include <QSettings>
 #include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -53,6 +57,43 @@ MainWindow::MainWindow(QWidget *parent)
                     calculateTotalTaxBase();
                 else
                     calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
+    });
+
+    connect(ui->actionEVDSKey, &QAction::triggered, this, [this]() {
+        EvdsKeyDialog dialog(this);
+        QSettings settings;
+        dialog.setCurrentKey(settings.value("evds/api_key").toString());
+        if (dialog.exec() == QDialog::Accepted) {
+            QString newKey = dialog.key();
+            settings.setValue("evds/api_key", newKey);
+            HttpManager::getInstance()->setKey(newKey);
+        }
+    });
+
+    connect(ui->actionEVDSKeyHelp, &QAction::triggered, this, [this]() {
+        EvdsKeyHelpDialog dialog(this);
+        dialog.setText(
+            "<p><b>EVDS API anahtarınızı almak için aşağıdaki adımları izleyin:</b></p>"
+            "<ol>"
+            "<li><a href=\"https://evds3.tcmb.gov.tr/login\">https://evds3.tcmb.gov.tr/login</a> "
+            "adresine gidin.</li>"
+            "<li>Daha önce hesap oluşturduysanız <b>Giriş</b> sekmesinden giriş yapın. "
+            "İlk kez kullanıyorsanız <b>Kayıt</b> sekmesinden formu doldurup kayıt olun, "
+            "ardından giriş yapın.</li>"
+            "<li>Giriş başarılıysa tarayıcının sağ üst köşesinde "
+            "\"<i>Sisteme başarıyla giriş yapıldı</i>\" mesajını göreceksiniz.</li>"
+            "<li>Sağ üst köşedeki açılır menüye tıklayıp <b>Profilim</b>'i seçin.</li>"
+            "<li>Sayfanın en altında <b>API KEY KOPYALA</b> butonuna tıklayın. "
+            "Anahtar panonuza kopyalanacaktır.</li>"
+            "</ol>"
+            "<p><b>Anahtarı uygulamaya girmek için:</b></p>"
+            "<ol>"
+            "<li>Bu uygulamada <b>Ayarlar → EVDS anahtarını değiştir...</b> menüsünü açın.</li>"
+            "<li>Açılan alana anahtarı yapıştırın (<i>Ctrl+V</i>).</li>"
+            "<li><b>OK</b>'e tıklayın.</li>"
+            "</ol>"
+        );
+        dialog.exec();
     });
 
     // Drain loop setups starts here.
@@ -286,7 +327,18 @@ void MainWindow::onPotentialCalculateButtonClicked() {
 }
 
 void MainWindow::onFetchFailed(const QString &error) {
-    QMessageBox::warning(this, "İşlem Başarısız", error);
+    QString errorMessage;
+    QSettings settings;
+    if (settings.value("evds/api_key").toString().isEmpty()) {
+        errorMessage = "\n\nEVDS API anahtarı ayarlanmamış. "
+                   "Lütfen Ayarlar → EVDS anahtarını değiştir... menüsünden anahtarınızı girin.";
+    }
+    else {
+        errorMessage = "\n\nAğ veya API erişimi hatası.\n";
+        errorMessage += error;
+    }
+
+    QMessageBox::warning(this, "İşlem Başarısız", errorMessage);
 }
 
 void MainWindow::calculateTotalTaxBase(double potential) {

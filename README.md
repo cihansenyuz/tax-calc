@@ -8,6 +8,7 @@ A desktop application to help Turkish citizens calculate income tax on foreign s
 - Calculates tax base for closed positions and potential tax base for open positions, automatically fetching USD exchange rates and inflation indices from TCMB EVDS API
 - Supports multi-position selection for batch close, delete, and potential-tax calculations
 - Configurable tax rate (15%, 20%, 27%, 35%, 40%) and declaration limit
+- Configurable EVDS API key stored persistently via the Settings menu
 - Displays all positions in a sortable table (ID, symbol, name, quantity, buy/sell date & price, status, tax base)
 - Summarizes total tax base and estimated tax liability
 - Modern Qt6 GUI
@@ -55,6 +56,16 @@ cmake --build build
 # Show help and available options
 ./build/tax_calc --help
 ```
+
+## EVDS API Key Setup
+
+This application requires a free EVDS API key from TCMB to fetch exchange rates and inflation indices.
+
+1. Go to [https://evds3.tcmb.gov.tr/login](https://evds3.tcmb.gov.tr/login) and register or log in.
+2. Navigate to **Profilim** from the top-right dropdown and click **API KEY KOPYALA** at the bottom of the page.
+3. In the application, open **Ayarlar → EVDS anahtarını değiştir...**, paste the key, and click **Tamam**.
+
+For step-by-step instructions, use the **Yardım → EVDS anahtarı hakkında** menu inside the application.
 
 ## Usage
 

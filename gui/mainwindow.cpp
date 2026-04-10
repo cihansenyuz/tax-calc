@@ -300,7 +300,18 @@ void MainWindow::onPotentialCalculateButtonClicked() {
 }
 
 void MainWindow::onFetchFailed(const QString &error) {
-    QMessageBox::warning(this, "İşlem Başarısız", error);
+    QString errorMessage;
+    QSettings settings;
+    if (settings.value("evds/api_key").toString().isEmpty()) {
+        errorMessage = "\n\nEVDS API anahtarı ayarlanmamış. "
+                   "Lütfen Ayarlar → EVDS anahtarını değiştir... menüsünden anahtarınızı girin.";
+    }
+    else {
+        errorMessage = "\n\nAğ veya API erişimi hatası.\n";
+        errorMessage += error;
+    }
+
+    QMessageBox::warning(this, "İşlem Başarısız", errorMessage);
 }
 
 void MainWindow::calculateTotalTaxBase(double potential) {

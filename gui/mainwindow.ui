@@ -528,18 +528,30 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAyarlar">
+   <widget class="QMenu" name="menuSettings">
     <property name="title">
      <string>Ayarlar</string>
     </property>
     <addaction name="actionEVDSKey"/>
    </widget>
-   <addaction name="menuAyarlar"/>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Yardım</string>
+    </property>
+    <addaction name="actionEVDSKeyHelp"/>
+   </widget>
+   <addaction name="menuSettings"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionEVDSKey">
    <property name="text">
     <string>EVDS anahtarını değiştir...</string>
+   </property>
+  </action>
+  <action name="actionEVDSKeyHelp">
+   <property name="text">
+    <string>EVDS anahtarı hakkında</string>
    </property>
   </action>
  </widget>

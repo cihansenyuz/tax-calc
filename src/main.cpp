@@ -7,6 +7,7 @@ int main(int argc, char *argv[]) {
     Logger::initialize("tax_calc.log", false);
     
     QApplication application(argc, argv);
+    application.setOrganizationName("tax-calc");
     application.setApplicationName("Hisse Beyan Yardımcısı");
     application.setApplicationVersion("1.0.0");
 

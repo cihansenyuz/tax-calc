@@ -39,6 +39,9 @@ set(PROJECT_SOURCES
         gui/createdialog.ui
         gui/createdialog.cpp
         gui/createdialog.hpp
+        gui/evdskeysdialog.ui
+        gui/evdskeysdialog.cpp
+        gui/evdskeysdialog.hpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

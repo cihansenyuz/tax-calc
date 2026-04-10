@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     QApplication application(argc, argv);
     application.setOrganizationName("tax-calc");
     application.setApplicationName("Hisse Beyan Yardımcısı");
-    application.setApplicationVersion("1.0.0");
+    application.setApplicationVersion("0.4.0");
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Turkish stock tax calculator");

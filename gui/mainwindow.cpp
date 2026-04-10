@@ -3,6 +3,7 @@
 #include "../inc/calculator.hpp"
 #include "../inc/network/httpmanager.hpp"
 #include "evdskeysdialog.hpp"
+#include "evdskeyhelpdiag.hpp"
 #include <QMessageBox>
 #include <QSettings>
 #include <QTimer>
@@ -67,6 +68,11 @@ MainWindow::MainWindow(QWidget *parent)
             settings.setValue("evds/api_key", newKey);
             HttpManager::getInstance()->setKey(newKey);
         }
+    });
+
+    connect(ui->actionEVDSKeyHelp, &QAction::triggered, this, [this]() {
+        EvdsKeyHelpDialog dialog(this);
+        dialog.exec();
     });
 
     // Drain loop setups starts here.

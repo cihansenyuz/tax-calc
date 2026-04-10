@@ -42,6 +42,9 @@ set(PROJECT_SOURCES
         gui/evdskeysdialog.ui
         gui/evdskeysdialog.cpp
         gui/evdskeysdialog.hpp
+        gui/evdskeyhelpdiag.ui
+        gui/evdskeyhelpdiag.cpp
+        gui/evdskeyhelpdiag.hpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

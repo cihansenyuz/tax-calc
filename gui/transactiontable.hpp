@@ -96,7 +96,7 @@ public:
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 8, item);
         
-        item = new QTableWidgetItem(QString::number(transaction.getTaxBase()));
+        item = new QTableWidgetItem(Calculator::formatCurrency(transaction.getTaxBase()), transaction.getTaxBase());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 9, item);
         }

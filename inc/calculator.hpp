@@ -33,4 +33,15 @@ public:
             return 0.0;
         }
     }
+
+    static QString formatCurrency(double value) {
+        QString str = QString::number(value, 'f', 2);
+        int dotPos = str.indexOf('.');
+        int insertPos = (dotPos == -1) ? str.length() : dotPos;
+        int startPos = (str.startsWith('-') || str.startsWith('+')) ? 1 : 0;
+        for (int i = insertPos - 3; i > startPos; i -= 3) {
+            str.insert(i, ',');
+        }
+        return str;
+    }
 };

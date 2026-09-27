@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
         if(ui->potentialCalculatedTaxLabel->text().isEmpty())
             calculateTotalTaxBase();
         else
-            calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
+            calculateTotalTaxBase(m_potentialAccumulator);
         });
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
                if(ui->potentialCalculatedTaxLabel->text().isEmpty())
                     calculateTotalTaxBase();
                 else
-                    calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
+                    calculateTotalTaxBase(m_potentialAccumulator);
     });
 
     connect(ui->actionEVDSKey, &QAction::triggered, this, [this]() {
@@ -160,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent)
     };
 
     m_potentialDrain.onDone = [this]() {
-        ui->potentialCalculatedTaxLabel->setText(QString::number(m_potentialAccumulator, 'f', 2) + " ₺");
+        ui->potentialCalculatedTaxLabel->setText(Calculator::formatCurrency(m_potentialAccumulator) + " ₺");
         calculateTotalTaxBase(m_potentialAccumulator);
     };
     // Drain loop setups ends here.
@@ -359,12 +359,12 @@ void MainWindow::calculateTotalTaxBase(double potential) {
     }
 
     totalTaxBase += potential;
-    ui->totalTaxBaseLabel->setText(QString::number(totalTaxBase, 'f', 2) + " ₺");
+    ui->totalTaxBaseLabel->setText(Calculator::formatCurrency(totalTaxBase) + " ₺");
 
     double calculatedTax = Calculator::calculateTax(totalTaxBase,
                             ui->taxRangesComboBox->currentData().toDouble(),
                             ui->declaretionLimitSpinBox->value());
-    ui->calculatedTaxLabel->setText(QString::number(calculatedTax, 'f', 2) + " ₺");
+    ui->calculatedTaxLabel->setText(Calculator::formatCurrency(calculatedTax) + " ₺");
 }
 
 void MainWindow::onSelectButtonClicked() {
@@ -392,5 +392,6 @@ void MainWindow::onSelectButtonClicked() {
 void MainWindow::onResetPotCalcButtonClicked() {
     ui->potentialSellPriceSpinBox->setValue(0.0);
     ui->potentialCalculatedTaxLabel->clear();
+    m_potentialAccumulator = 0.0;
     calculateTotalTaxBase();
 }

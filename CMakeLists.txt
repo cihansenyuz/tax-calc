@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
         src/network/yahoofinancefetcher.cpp
         src/database/transactiondatabase.cpp
         src/transactionmanager.cpp
+        src/transactionreporter.cpp
 
         inc/logger.hpp
         inc/network/networkcore.hpp
@@ -30,6 +31,7 @@ set(PROJECT_SOURCES
         inc/network/yahoofinancefetcher.hpp
         inc/database/transactiondatabase.hpp
         inc/transactionmanager.hpp
+        inc/transactionreporter.hpp
         inc/calculator.hpp
 
         gui/mainwindow.ui

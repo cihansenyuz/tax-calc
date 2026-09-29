@@ -6,6 +6,10 @@
 #include <condition_variable>
 #include "transaction.hpp"
 #include "database/transactiondatabase.hpp"
+#include "calculator.hpp"
+
+struct FetchedValue { double value = 0.0; QDate date; };
+struct FetchResult { FetchedValue m_exchangeRate; FetchedValue m_inflationIndex; };
 
 class TransactionManager : public QObject {
     Q_OBJECT
@@ -50,7 +54,7 @@ private slots:
 private:
     std::vector<Transaction> m_transactions;
     Transaction m_transaction_to_be_updated;
-    std::pair<double, double> m_data_to_be_updated{0.0, 0.0}; // (USD, TUFE)
+    FetchResult m_data_to_be_updated; // (USD, TUFE)
     std::mutex m_mutex;
     TransactionType m_currentTransactionType;
     bool m_exchangeRateReceived{false};
@@ -62,4 +66,20 @@ private:
     void processOpenTransaction();
     void processCloseTransaction();
     void processPotentialTransaction();
+};
+
+class TransactionReporter {
+public:
+    static void writeReport(const Transaction& transaction,
+                             TransactionManager::TransactionType action,
+                             const FetchResult& buyData,
+                             const FetchResult& sellData,
+                             const TaxCalculationBreakdown& breakdown);
+private:
+    static QString actionToString(TransactionManager::TransactionType action);
+    static QString buildReportText(const Transaction& transaction,
+                                    TransactionManager::TransactionType action,
+                                    const FetchResult& buyData,
+                                    const FetchResult& sellData,
+                                    const TaxCalculationBreakdown& breakdown);
 };

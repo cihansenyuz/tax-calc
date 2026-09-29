@@ -4,6 +4,7 @@
 #include <QDate>
 #include "../inc/transaction.hpp"
 #include "../inc/logger.hpp"
+#include "../inc/calculator.hpp"
 
 // Custom item class that sorts dates correctly
 class DateTableWidgetItem : public QTableWidgetItem {

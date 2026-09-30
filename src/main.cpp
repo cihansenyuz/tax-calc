@@ -7,8 +7,9 @@ int main(int argc, char *argv[]) {
     Logger::initialize("tax_calc.log", false);
     
     QApplication application(argc, argv);
+    application.setOrganizationName("tax-calc");
     application.setApplicationName("Hisse Beyan Yardımcısı");
-    application.setApplicationVersion("0.2.2");
+    application.setApplicationVersion("0.4.0");
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Turkish stock tax calculator");

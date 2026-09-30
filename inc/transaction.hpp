@@ -30,7 +30,7 @@ public:
           const std::string& symbolName,
           QDate buyDate,
           double buyPrice,
-          int quantity,
+          double quantity,
           QDate sellDate = QDate(),
           double sellPrice = 0.0,
           Status status = Status::Open,
@@ -61,7 +61,7 @@ public:
            const std::string& symbolName,
            QDate buyDate,
            double buyPrice,
-           int quantity) {
+           double quantity) {
         int id;
         do {
             id = rand();
@@ -75,7 +75,7 @@ public:
     QString getBuyDate() const { return m_buyDate.toString("dd-MM-yyyy"); }
     QDate getBuyQDate() const { return m_buyDate; }
     double getBuyPrice() const { return m_buyPrice; }
-    int getQuantity() const { return m_quantity; }
+    double getQuantity() const { return m_quantity; }
     QString getSellDate() const { return m_sellDate.isValid() ? m_sellDate.toString("dd-MM-yyyy") : ""; }
     QDate getSellQDate() const { return m_sellDate; }
     double getSellPrice() const { return m_sellPrice; }
@@ -91,7 +91,7 @@ public:
     void setSymbol(const std::string& s) { m_symbol = s; }
     void setSymbolName(const std::string& n) { m_symbolName = n; }
     void setBuyPrice(double p) { m_buyPrice = p; }
-    void setQuantity(int q) { m_quantity = q; }
+    void setQuantity(double q) { m_quantity = q; }
     void setSellDate(const QDate& d) { m_sellDate = d; }
     void setSellPrice(double p) { m_sellPrice = p; }
     void setStatus(Status s) { m_status = s; }
@@ -108,7 +108,7 @@ private:
     std::string m_symbolName;
     QDate m_buyDate;
     double m_buyPrice;
-    int m_quantity;
+    double m_quantity;
     QDate m_sellDate;
     double m_sellPrice;
     Status m_status = Status::Open;

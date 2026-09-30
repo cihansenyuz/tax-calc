@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>848</width>
     <height>600</height>
    </rect>
   </property>
@@ -300,9 +300,6 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5"/>
-    </item>
-    <item>
      <widget class="QGroupBox" name="potHesapGroupBox">
       <property name="title">
        <string/>
@@ -313,7 +310,7 @@
          <property name="title">
           <string>Bugün Kapatırsam?</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,1">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,0">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
@@ -372,11 +369,22 @@
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="calculatePotentialTaxButton">
-            <property name="text">
-             <string>Hesapla</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_17">
+            <item>
+             <widget class="QPushButton" name="resetPotCalcButton">
+              <property name="text">
+               <string>Sıfırla</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="calculatePotentialTaxButton">
+              <property name="text">
+               <string>Hesapla</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -516,12 +524,36 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>845</width>
+     <width>848</width>
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Ayarlar</string>
+    </property>
+    <addaction name="actionEVDSKey"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Yardım</string>
+    </property>
+    <addaction name="actionEVDSKeyHelp"/>
+   </widget>
+   <addaction name="menuSettings"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionEVDSKey">
+   <property name="text">
+    <string>EVDS anahtarını değiştir...</string>
+   </property>
+  </action>
+  <action name="actionEVDSKeyHelp">
+   <property name="text">
+    <string>EVDS anahtarı hakkında</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -3,6 +3,8 @@
 #include <QTableWidget>
 #include <QDate>
 #include "../inc/transaction.hpp"
+#include "../inc/logger.hpp"
+#include "../inc/calculator.hpp"
 
 // Custom item class that sorts dates correctly
 class DateTableWidgetItem : public QTableWidgetItem {
@@ -32,7 +34,22 @@ public:
     setMinimumSize(800, 400);
     resizeColumnsToContents();
     setSortingEnabled(true);
+
+    connect(this, &QTableWidget::itemSelectionChanged, this, [this]() {
+        m_selectedIds.clear();
+        QSet<int> seenRows;
+        for (QTableWidgetItem *item : selectedItems()) {
+            int row = item->row();
+            if (seenRows.contains(row)) continue;
+            seenRows.insert(row);
+            QTableWidgetItem *idItem = this->item(row, 0);
+            if (idItem) m_selectedIds.append(idItem->text());
+        }
+        qCDebug(logGui) << "Selected IDs:" << m_selectedIds;
+    });
 }
+
+    const QList<QString>& selectedIds() const { return m_selectedIds; }
 
     void refresh(const std::vector<Transaction> &transactions) {
         setSortingEnabled(false);  // Disable during refresh
@@ -56,7 +73,7 @@ public:
         item = new QTableWidgetItem(QString::fromStdString(transaction.getSymbolName()));
         setItem(currentRow, 2, item);
 
-        item = new QTableWidgetItem(QString::number(transaction.getQuantity()));
+        item = new QTableWidgetItem(QString::number(transaction.getQuantity(), 'g', 15));
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 3, item);
 
@@ -80,7 +97,7 @@ public:
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 8, item);
         
-        item = new QTableWidgetItem(QString::number(transaction.getTaxBase()));
+        item = new QTableWidgetItem(Calculator::formatCurrency(transaction.getTaxBase()), transaction.getTaxBase());
         item->setTextAlignment(Qt::AlignCenter);
         setItem(currentRow, 9, item);
         }
@@ -90,6 +107,7 @@ public:
     }
 
 private:
+    QList<QString> m_selectedIds;
     QStringList m_labels{
         "Pozisyon No", "Sembol", "İsim", "Adet", "Alış Tarihi",
         "Alış Fiyatı", "Satış Tarihi", "Satış Fiyatı",

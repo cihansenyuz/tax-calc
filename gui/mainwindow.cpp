@@ -1,7 +1,12 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 #include "../inc/calculator.hpp"
+#include "../inc/network/httpmanager.hpp"
+#include "evdskeysdialog.hpp"
+#include "evdskeyhelpdiag.hpp"
 #include <QMessageBox>
+#include <QSettings>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -27,6 +32,15 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onFetchFailed);
     connect(ui->selectButton, &QPushButton::clicked,
             this, &MainWindow::onSelectButtonClicked);
+    connect(ui->resetPotCalcButton, &QPushButton::clicked,
+            this, &MainWindow::onResetPotCalcButtonClicked);
+    connect(ui->declaretionLimitSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+        this, [this]() {
+        if(ui->potentialCalculatedTaxLabel->text().isEmpty())
+            calculateTotalTaxBase();
+        else
+            calculateTotalTaxBase(m_potentialAccumulator);
+        });
     
     qobject_cast<QHBoxLayout*>(ui->horizontalLayout_4->layout())->insertWidget(0, &m_table);
     m_table.refresh(transaction_manager->getTransactions());
@@ -42,27 +56,140 @@ MainWindow::MainWindow(QWidget *parent)
                if(ui->potentialCalculatedTaxLabel->text().isEmpty())
                     calculateTotalTaxBase();
                 else
-                    calculateTotalTaxBase(ui->potentialCalculatedTaxLabel->text().toDouble());
-            });
+                    calculateTotalTaxBase(m_potentialAccumulator);
+    });
 
+    connect(ui->actionEVDSKey, &QAction::triggered, this, [this]() {
+        EvdsKeyDialog dialog(this);
+        QSettings settings;
+        dialog.setCurrentKey(settings.value("evds/api_key").toString());
+        if (dialog.exec() == QDialog::Accepted) {
+            QString newKey = dialog.key();
+            settings.setValue("evds/api_key", newKey);
+            HttpManager::getInstance()->setKey(newKey);
+        }
+    });
+
+    connect(ui->actionEVDSKeyHelp, &QAction::triggered, this, [this]() {
+        EvdsKeyHelpDialog dialog(this);
+        dialog.setText(
+            "<p><b>EVDS API anahtarınızı almak için aşağıdaki adımları izleyin:</b></p>"
+            "<ol>"
+            "<li><a href=\"https://evds3.tcmb.gov.tr/login\">https://evds3.tcmb.gov.tr/login</a> "
+            "adresine gidin.</li>"
+            "<li>Daha önce hesap oluşturduysanız <b>Giriş</b> sekmesinden giriş yapın. "
+            "İlk kez kullanıyorsanız <b>Kayıt</b> sekmesinden formu doldurup kayıt olun, "
+            "ardından giriş yapın.</li>"
+            "<li>Giriş başarılıysa tarayıcının sağ üst köşesinde "
+            "\"<i>Sisteme başarıyla giriş yapıldı</i>\" mesajını göreceksiniz.</li>"
+            "<li>Sağ üst köşedeki açılır menüye tıklayıp <b>Profilim</b>'i seçin.</li>"
+            "<li>Sayfanın en altında <b>API KEY KOPYALA</b> butonuna tıklayın. "
+            "Anahtar panonuza kopyalanacaktır.</li>"
+            "</ol>"
+            "<p><b>Anahtarı uygulamaya girmek için:</b></p>"
+            "<ol>"
+            "<li>Bu uygulamada <b>Ayarlar → EVDS anahtarını değiştir...</b> menüsünü açın.</li>"
+            "<li>Açılan alana anahtarı yapıştırın (<i>Ctrl+V</i>).</li>"
+            "<li><b>OK</b>'e tıklayın.</li>"
+            "</ol>"
+        );
+        dialog.exec();
+    });
+
+    // Drain loop setups starts here.
+    m_closeDrain.connectAdvance = [this](std::function<void()> proceed) {
+        return connect(transaction_manager, &TransactionManager::databaseReady,
+                this, proceed, Qt::SingleShotConnection);
+    };
+
+    m_closeDrain.action = [this](const Transaction &t) {
+        connect(transaction_manager, &TransactionManager::fetchFailed,
+                this, &MainWindow::abortClose, Qt::SingleShotConnection);
+        
+        qDebug() << "Closing transaction with ID:" << t.getId();
+        
+        QTimer::singleShot(1000, this, [this, t]() {
+                transaction_manager->closeTransaction(t);
+        });
+    };
+
+    m_closeDrain.onDone = [this]() {
+        onCleanSelectionButtonClicked();
+        onResetPotCalcButtonClicked();
+    };
+
+    m_deleteDrain.connectAdvance = [this](std::function<void()> proceed) {
+        return connect(transaction_manager, &TransactionManager::databaseReady,
+                this, proceed, static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
+    };
+
+    m_deleteDrain.action = [this](const Transaction &t) {
+        qDebug() << "Deleting transaction with ID:" << t.getId();
+        try {
+            transaction_manager->removeTransaction(t.getId());
+        } catch (const std::runtime_error &e) {
+            QObject::disconnect(m_deleteDrain.nextConnection);
+            QMessageBox::warning(this, "Pozisyon Sil", e.what());
+            m_deleteDrain.queue = {};
+            onCleanSelectionButtonClicked();
+        }
+    };
+
+    m_deleteDrain.onDone = [this]() {
+        QMessageBox::information(this, "Pozisyon Sil", "Seçili pozisyonlar başarıyla silindi.");
+        onCleanSelectionButtonClicked();
+    };
+
+    m_potentialDrain.connectAdvance = [this](std::function<void()> proceed) {
+        return connect(transaction_manager, &TransactionManager::potentialTaxBaseReady,
+                this, [this, proceed](double potentialTaxBase) {
+                    m_potentialAccumulator += potentialTaxBase;
+                    proceed();
+                }, Qt::SingleShotConnection);
+    };
+
+    m_potentialDrain.action = [this](const Transaction &t) {
+        connect(transaction_manager, &TransactionManager::fetchFailed,
+                this, &MainWindow::abortPotentialCalc, Qt::SingleShotConnection);
+
+        qDebug() << "Calculating potential tax base for ID:" << t.getId();
+        
+        QTimer::singleShot(1000, this, [this, t]() {
+                transaction_manager->potentialTransaction(t);
+        });
+    };
+
+    m_potentialDrain.onDone = [this]() {
+        ui->potentialCalculatedTaxLabel->setText(Calculator::formatCurrency(m_potentialAccumulator) + " ₺");
+        calculateTotalTaxBase(m_potentialAccumulator);
+    };
+    // Drain loop setups ends here.
+    
     calculateTotalTaxBase();
 }
 
 MainWindow::~MainWindow() {
+    if (m_closeDrain.progressDialog) {
+        m_closeDrain.progressDialog->deleteLater();
+        m_closeDrain.progressDialog = nullptr;
+    }
     delete transaction_manager;
     delete ui;
 }
 
 void MainWindow::onDatabaseReady() {
-    // qDebug() << "Database is ready, refreshing table.";
+    qDebug() << "Database is ready, refreshing table.";
     m_table.refresh(transaction_manager->getTransactions());
     calculateTotalTaxBase();
 }
 
 void MainWindow::onCleanSelectionButtonClicked() {
+    m_table.clearSelection();
+    m_selectedTransactions.clear();
     ui->symbolLabel->clear();
     ui->quantityLabel->clear();
     ui->IDlabel->clear();
+    onResetPotCalcButtonClicked();
 }
 
 void MainWindow::onCreateButtonClicked() {
@@ -77,29 +204,24 @@ void MainWindow::onCreateButtonClicked() {
 }
 
 void MainWindow::onDeletePositionButtonClicked() {
-    if(ui->IDlabel->text().isEmpty()) {
+    if(m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Pozisyon Sil", "Silinecek pozisyon seçilmedi.");
         return;
     }
 
-    int id = ui->IDlabel->text().toInt();
-                
-    try{
-        transaction_manager->removeTransaction(id);
-    } catch (const std::runtime_error& e) {
-        QMessageBox::warning(this, "Pozisyon Sil", e.what());
-        return;
-    }
-    QMessageBox::information(this, "Pozisyon Sil", "Pozisyon başarıyla silindi.");
+    m_deleteDrain.queue = {};
+    for (const Transaction& t : m_selectedTransactions)
+        m_deleteDrain.queue.push(t);
+
+    runNext(m_deleteDrain);
 }
 
 void MainWindow::onCloseTransactionButtonClicked() {
-    if (ui->IDlabel->text().isEmpty()) {
+    if (m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Giriş Hatası", "Kapatılacak pozisyon seçilmedi.");
         return;
     }
 
-    Transaction selectedTransaction = transaction_manager->findTransactionById(ui->IDlabel->text().toInt());
     double sellPrice = ui->sellPriceSpinBox->value();
     QDate sellDate = ui->sellDateEdit->date();
 
@@ -108,41 +230,115 @@ void MainWindow::onCloseTransactionButtonClicked() {
         return;
     }
 
-    selectedTransaction.setSellDate(sellDate);
-    selectedTransaction.setSellPrice(sellPrice);
-    selectedTransaction.setStatus(Transaction::Status::Closed);
+    m_closeDrain.queue = {};
+    for (Transaction t : m_selectedTransactions) {
+        t.setSellDate(sellDate);
+        t.setSellPrice(sellPrice);
+        t.setStatus(Transaction::Status::Closed);
+        m_closeDrain.queue.push(t);
+    }
 
-    transaction_manager->closeTransaction(selectedTransaction);
+    m_closeDrain.total = static_cast<int>(m_closeDrain.queue.size());
+    m_closeDrain.progressDialog = new QProgressDialog("Pozisyonlar kapatılıyor...", QString(), 0, m_closeDrain.total, this);
+    m_closeDrain.progressDialog->setWindowModality(Qt::WindowModal);
+    m_closeDrain.progressDialog->setMinimumDuration(0);
+    m_closeDrain.progressDialog->setValue(0);
+
+    runNext(m_closeDrain);
+}
+
+void MainWindow::abortClose(const QString &error) {
+    QObject::disconnect(m_closeDrain.nextConnection);
+    if (m_closeDrain.progressDialog) {
+        m_closeDrain.progressDialog->deleteLater();
+        m_closeDrain.progressDialog = nullptr;
+    }
+    QMessageBox::warning(this, "Pozisyon Kapat", error);
+    m_closeDrain.queue = {};
+    onCleanSelectionButtonClicked();
+    qCritical(logNetwork) << "Failed to close transaction due to EVDS API error with ID:"
+                          << m_closeDrain.pendingId << "Error:" << error;
+}
+
+void MainWindow::abortPotentialCalc(const QString &error) {
+    QObject::disconnect(m_potentialDrain.nextConnection);
+    if (m_potentialDrain.progressDialog) {
+        m_potentialDrain.progressDialog->deleteLater();
+        m_potentialDrain.progressDialog = nullptr;
+    }
+    QMessageBox::warning(this, "Potansiyel Hesaplama", error);
+    m_potentialDrain.queue = {};
+    m_potentialAccumulator = 0.0;
+    qCritical(logNetwork) << "Failed potential calc due to EVDS API error with ID:"
+                          << m_potentialDrain.pendingId << "Error:" << error;
+}
+
+void MainWindow::runNext(DrainContext &ctx) {
+    if (ctx.queue.empty()) {
+        if (ctx.progressDialog) {
+            ctx.progressDialog->setValue(ctx.total);
+            ctx.progressDialog->deleteLater();
+            ctx.progressDialog = nullptr;
+        }
+        ctx.onDone();
+        return;
+    }
+
+    if (ctx.progressDialog)
+        ctx.progressDialog->setValue(ctx.total - static_cast<int>(ctx.queue.size()));
+
+    Transaction t = ctx.queue.front();
+    ctx.queue.pop();
+    ctx.pendingId = t.getId();
+
+    ctx.nextConnection = ctx.connectAdvance([this, &ctx]() { runNext(ctx); });
+
+    ctx.action(t);
 }
 
 void MainWindow::onPotentialCalculateButtonClicked() {
-    if (ui->IDlabel->text().isEmpty()) {
+    if (m_selectedTransactions.empty()) {
         QMessageBox::warning(this, "Seçim Hatası", "Potansiyel vergi hesaplamak için lütfen bir pozisyon seçin.");
         return;
     }
 
-    Transaction selectedTransaction = transaction_manager->findTransactionById(ui->IDlabel->text().toInt());
     double potentialSellPrice = ui->potentialSellPriceSpinBox->value();
-    QDate currentDate = QDate::currentDate();
-
     if (potentialSellPrice <= 0) {
         QMessageBox::warning(this, "Giriş Hatası", "Lütfen geçerli bir satış fiyatı girin.");
         return;
     }
 
-    selectedTransaction.setSellDate(currentDate);
-    selectedTransaction.setSellPrice(potentialSellPrice);
+    QDate currentDate = QDate::currentDate();
+    m_potentialDrain.queue = {};
+    for (Transaction t : m_selectedTransactions) {
+        t.setSellDate(currentDate);
+        t.setSellPrice(potentialSellPrice);
+        m_potentialDrain.queue.push(t);
+    }
 
-    connect(transaction_manager, &TransactionManager::potentialTaxBaseReady,
-            this, [this](double potentialTaxBase) {
-                ui->potentialCalculatedTaxLabel->setText(QString::number(potentialTaxBase, 'f', 2) + " ₺");
-                calculateTotalTaxBase(potentialTaxBase);
-            }, Qt::SingleShotConnection);
-    transaction_manager->potentialTransaction(selectedTransaction);
+    m_potentialDrain.total = static_cast<int>(m_potentialDrain.queue.size());
+    m_potentialDrain.progressDialog = new QProgressDialog("Potansiyel gelir ve vergisi hesaplanıyor...", QString(), 0, m_potentialDrain.total, this);
+    m_potentialDrain.progressDialog->setWindowModality(Qt::WindowModal);
+    m_potentialDrain.progressDialog->setMinimumDuration(0);
+    m_potentialDrain.progressDialog->setValue(0);
+
+    m_potentialAccumulator = 0.0;
+    runNext(m_potentialDrain);
 }
 
 void MainWindow::onFetchFailed(const QString &error) {
-    QMessageBox::warning(this, "İşlem Başarısız", error);
+    QString errorMessage;
+    QSettings settings;
+    if (settings.value("evds/api_key").toString().isEmpty()) {
+        errorMessage = "\n\nEVDS API anahtarı ayarlanmamış. "
+                   "Lütfen Ayarlar → EVDS anahtarını değiştir... menüsünden anahtarınızı girin.";
+    }
+    else {
+        errorMessage = "\n\nAğ veya API erişimi hatası.\n";
+        errorMessage += error;
+    }
+
+    QMessageBox::warning(this, "İşlem Başarısız", errorMessage);
 }
 
 void MainWindow::calculateTotalTaxBase(double potential) {
@@ -163,27 +359,39 @@ void MainWindow::calculateTotalTaxBase(double potential) {
     }
 
     totalTaxBase += potential;
-    ui->totalTaxBaseLabel->setText(QString::number(totalTaxBase, 'f', 2) + " ₺");
+    ui->totalTaxBaseLabel->setText(Calculator::formatCurrency(totalTaxBase) + " ₺");
 
     double calculatedTax = Calculator::calculateTax(totalTaxBase,
                             ui->taxRangesComboBox->currentData().toDouble(),
                             ui->declaretionLimitSpinBox->value());
-    ui->calculatedTaxLabel->setText(QString::number(calculatedTax, 'f', 2) + " ₺");
+    ui->calculatedTaxLabel->setText(Calculator::formatCurrency(calculatedTax) + " ₺");
 }
 
 void MainWindow::onSelectButtonClicked() {
-    int selectedRow = m_table.currentRow();
-    if (selectedRow < 0) {
+    const QList<QString> &ids = m_table.selectedIds();
+    if (ids.isEmpty()) {
         QMessageBox::warning(this, "Seçim Hatası", "Lütfen kapatılacak bir işlem seçin.");
         return;
     }
-    QTableWidgetItem *item = m_table.item(selectedRow, 0);
-    if (!item) {
-        QMessageBox::warning(this, "Seçim Hatası", "Geçerli bir işlem seçilmedi.");
-        return;
+
+    m_selectedTransactions.clear();
+    QStringList symbols, quantities, idStrings;
+    for (const QString &idStr : ids) {
+        Transaction selectedTransaction = transaction_manager->findTransactionById(idStr.toInt());
+        m_selectedTransactions.push_back(selectedTransaction);
+        symbols    << QString::fromStdString(selectedTransaction.getSymbol());
+        quantities << QString::number(selectedTransaction.getQuantity(), 'g', 15);
+        idStrings  << QString::number(selectedTransaction.getId());
     }
-    Transaction selectedTransaction = transaction_manager->findTransactionById(item->text().toInt());
-    ui->symbolLabel->setText(QString::fromStdString(selectedTransaction.getSymbol()));
-    ui->quantityLabel->setText(QString::number(selectedTransaction.getQuantity()));
-    ui->IDlabel->setText(QString::number(selectedTransaction.getId()));
+
+    ui->symbolLabel->setText(symbols.join("\n"));
+    ui->quantityLabel->setText(quantities.join("\n"));
+    ui->IDlabel->setText(idStrings.join("\n"));
+}
+
+void MainWindow::onResetPotCalcButtonClicked() {
+    ui->potentialSellPriceSpinBox->setValue(0.0);
+    ui->potentialCalculatedTaxLabel->clear();
+    m_potentialAccumulator = 0.0;
+    calculateTotalTaxBase();
 }

@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
         src/network/yahoofinancefetcher.cpp
         src/database/transactiondatabase.cpp
         src/transactionmanager.cpp
+        src/transactionreporter.cpp
 
         inc/logger.hpp
         inc/network/networkcore.hpp
@@ -30,6 +31,7 @@ set(PROJECT_SOURCES
         inc/network/yahoofinancefetcher.hpp
         inc/database/transactiondatabase.hpp
         inc/transactionmanager.hpp
+        inc/transactionreporter.hpp
         inc/calculator.hpp
 
         gui/mainwindow.ui
@@ -39,6 +41,12 @@ set(PROJECT_SOURCES
         gui/createdialog.ui
         gui/createdialog.cpp
         gui/createdialog.hpp
+        gui/evdskeysdialog.ui
+        gui/evdskeysdialog.cpp
+        gui/evdskeysdialog.hpp
+        gui/evdskeyhelpdiag.ui
+        gui/evdskeyhelpdiag.cpp
+        gui/evdskeyhelpdiag.hpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
